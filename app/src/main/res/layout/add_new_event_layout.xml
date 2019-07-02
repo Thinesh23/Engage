@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:cardElevation="4dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="vertical">
+    <android.support.v7.widget.CardView
+        app:cardElevation="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp">
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edtName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:paddingLeft="5dp"
+                android:hint="Name"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:met_baseColor="@color/colorPrimary"
+                app:met_textColorHint="@color/colorPrimary"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/colorPrimary"
+                app:met_singleLineEllipsis="true" />
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edtDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:paddingLeft="5dp"
+                android:hint="Description"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtName"
+                app:met_baseColor="@color/colorPrimary"
+                app:met_textColorHint="@color/colorPrimary"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/colorPrimary"
+                app:met_singleLineEllipsis="true" />
+
+            <RadioGroup
+                android:id="@+id/rdiBook"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtDescription"
+                android:layout_margin="8dp"
+                android:paddingLeft="5dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/rdiPaid"
+                    android:layout_width="192dp"
+                    android:layout_height="wrap_content"
+                    android:text="PAID"
+                    android:theme="@style/MyRadioButton"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp" />
+
+                <RadioButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/MyRadioButton"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:text="FREE"
+                    android:checked="true"
+                    android:id="@+id/rdiFree"/>
+
+            </RadioGroup>
+
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edtPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:paddingLeft="5dp"
+                android:hint="Price"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rdiBook"
+                app:met_baseColor="@color/colorPrimary"
+                app:met_textColorHint="@color/colorPrimary"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/colorPrimary"
+                app:met_singleLineEllipsis="true" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edtLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:paddingLeft="5dp"
+                android:hint="Location"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtPrice"
+                app:met_baseColor="@color/colorPrimary"
+                app:met_textColorHint="@color/colorPrimary"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/colorPrimary"
+                app:met_singleLineEllipsis="true" />
+
+            <Button
+                android:id="@+id/btnSetDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:background="@color/colorPrimary"
+                android:text="Set Date"
+                android:textColor="@android:color/white"
+                app:layout_constraintEnd_toStartOf="@+id/btnUpload"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnSetTime" />
+
+            <Button
+                android:id="@+id/btnSetTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@color/colorPrimary"
+                android:text="Set Time"
+                android:textColor="@android:color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/btnSetDate"
+                app:layout_constraintTop_toBottomOf="@+id/edtLocation" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edtDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:paddingLeft="5dp"
+                android:hint="Date"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnSetTime"
+                app:met_baseColor="@color/colorPrimary"
+                app:met_textColorHint="@color/colorPrimary"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/colorPrimary"
+                app:met_singleLineEllipsis="true" />
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/edtTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:paddingLeft="5dp"
+                android:hint="Time"
+                android:textColor="@color/colorPrimary"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/edtDate"
+                app:met_baseColor="@color/colorPrimary"
+                app:met_textColorHint="@color/colorPrimary"
+                app:met_floatingLabel="highlight"
+                app:met_primaryColor="@color/colorPrimary"
+                app:met_singleLineEllipsis="true" />
+
+
+
+
+            <Button
+                android:id="@+id/btnSelect"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:background="@color/colorPrimary"
+                android:text="Select Image"
+                android:textColor="@android:color/white"
+                app:layout_constraintEnd_toStartOf="@+id/btnUpload"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/btnUpload" />
+
+            <Button
+                android:id="@+id/btnUpload"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:background="@color/colorPrimary"
+                android:text="Upload Image"
+                android:textColor="@android:color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/btnSelect"
+                app:layout_constraintTop_toBottomOf="@+id/edtTime" />
+
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
+
+</ScrollView>

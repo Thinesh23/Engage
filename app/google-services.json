@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "748399401355",
+    "firebase_url": "https://engage-26fe7.firebaseio.com",
+    "project_id": "engage-26fe7",
+    "storage_bucket": "engage-26fe7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:748399401355:android:98a0e9cbf31c5f82",
+        "android_client_info": {
+          "package_name": "example.com.engage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "748399401355-gmegejaueu053tlt8vka85jis5spal8c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "example.com.engage",
+            "certificate_hash": "ba986a6ad91948dc5b3d5a2cf0be80dbc49b019d"
+          }
+        },
+        {
+          "client_id": "748399401355-n52n2g0t9sko99govb2f6fi0ehjo8m41.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnoXiAGwX4wttU_uZ1ka86wlnVQwyoWcg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "748399401355-n52n2g0t9sko99govb2f6fi0ehjo8m41.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
