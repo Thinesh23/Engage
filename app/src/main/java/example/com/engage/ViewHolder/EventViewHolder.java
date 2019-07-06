@@ -27,7 +27,7 @@ public class EventViewHolder extends RecyclerView.ViewHolder implements
         event_name = (TextView) itemView.findViewById(R.id.event_name);
         event_booking = (TextView) itemView.findViewById(R.id.event_booking);
         event_image = (ImageView) itemView.findViewById(R.id.event_image);
-        fav_image = (ImageView) itemView.findViewById(R.id.fav);
+        //fav_image = (ImageView) itemView.findViewById(R.id.fav);
         share_image = (ImageView) itemView.findViewById(R.id.btnShare);
         //quick_cart = (ImageView) itemView.findViewById(R.id.btn_quick_cart);
 

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -53,7 +54,13 @@ public class MainActivity extends AppCompatActivity{
         btnSignUp = (Button)findViewById(R.id.btnSignUp);
 
         txtSlogan = (TextView)findViewById(R.id.txtslogan);
+        Typeface face = Typeface.createFromAsset(getAssets(), "fonts/Nabila.ttf");
+
         txtSlogan = (TextView)findViewById(R.id.app_logo);
+        Typeface face1 = Typeface.createFromAsset(getAssets(), "fonts/Nabila.ttf");
+
+
+        Paper.init(this);
 
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,12 +78,13 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-/*        String user = Paper.book().read(Common.USER_KEY);
+
+        String user = Paper.book().read(Common.USER_KEY);
         String pwd = Paper.book().read(Common.PWD_KEY);
         if(user != null && pwd != null){
             if(!user.isEmpty() && !pwd.isEmpty())
                 login(user,pwd);
-        }*/
+        }
     }
 
     private void printKeyHash() {

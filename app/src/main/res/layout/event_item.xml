@@ -48,13 +48,13 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
 
-            <ImageView
+<!--            <ImageView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:tint="@color/colorAccent"
                 android:id="@+id/fav"
-                android:src="@drawable/ic_favorite_border_black_24dp"/>
+                android:src="@drawable/ic_favorite_border_black_24dp"/>-->
 
         </LinearLayout>
 

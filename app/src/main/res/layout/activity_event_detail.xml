@@ -44,18 +44,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <com.andremion.counterfab.CounterFab
-        android:id="@+id/btnCart"
-        android:src="@drawable/ic_shopping_cart_black_24dp"
-        android:backgroundTint="@android:color/white"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:elevation="6dp"
-        app:pressedTranslationZ="12dp"
-        app:layout_anchor="@id/app_bar_layout"
-        app:layout_anchorGravity="bottom|right|end"
-        app:useCompatPadding="true"/>
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_rating"
         android:src="@drawable/ic_star_black_24dp"
@@ -76,7 +64,7 @@
         android:src="@drawable/ic_perm_contact_calendar_black_24dp"
         app:elevation="6dp"
         app:layout_anchor="@id/app_bar_layout"
-        app:layout_anchorGravity="bottom|center"
+        app:layout_anchorGravity="bottom|right|end"
         app:pressedTranslationZ="12dp"
         app:useCompatPadding="true" />
 
@@ -121,15 +109,6 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="RM"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-
-                        <TextView
                             android:id="@+id/event_price"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -169,13 +148,33 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <RatingBar
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:max="5"
-                        android:rating="0"
-                        android:id="@+id/ratingBar"
-                        android:isIndicator="true"/>
+                        android:orientation="horizontal">
+
+                        <RatingBar
+                            android:id="@+id/ratingBar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:isIndicator="true"
+                            android:max="5"
+                            android:rating="0" />
+
+                        <Button
+                            android:id="@+id/btnShowComment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_comment_black_24dp"
+                            android:layout_alignParentBottom="true"
+                            android:text="Show Comment"
+                            android:layout_margin="8dp"
+                            android:background="@color/colorAccent"
+                            android:textColor="@android:color/white" />
+
+                    </LinearLayout>
+
+
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -211,18 +210,78 @@
                             android:textSize="14sp"
                             android:text="Number" />
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:padding="12dp"
+                            android:lineSpacingMultiplier="1.5"
+                            android:textSize="14sp"
+                            android:text="Company :" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:padding="12dp"
+                            android:id="@+id/event_company"
+                            android:lineSpacingMultiplier="1.5"
+                            android:textSize="14sp"
+                            android:text="Name" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:padding="12dp"
+                            android:lineSpacingMultiplier="1.5"
+                            android:textSize="14sp"
+                            android:text="Email :" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:id="@+id/event_email"
+                            android:padding="12dp"
+                            android:lineSpacingMultiplier="1.5"
+                            android:textSize="14sp"
+                            android:text="Email Address" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
                         <android.support.design.widget.FloatingActionButton
                             android:id="@+id/btn_message"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:backgroundTint="@android:color/white"
-                            android:src="@drawable/ic_message_black_24dp"
+                            android:backgroundTint="@color/colorAccent"
+                            android:src="@drawable/ic_chat_bubble_outline_black_24dp"
                             app:elevation="6dp"
                             app:layout_anchor="@id/app_bar_layout"
                             app:pressedTranslationZ="12dp"
                             app:useCompatPadding="true" />
 
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/btn_profile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/colorAccent"
+                            android:src="@drawable/ic_system_update_black_24dp"
+                            app:elevation="6dp"
+                            app:layout_anchor="@id/app_bar_layout"
+                            app:pressedTranslationZ="12dp"
+                            app:useCompatPadding="true" />
                     </LinearLayout>
+
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -301,21 +360,15 @@
 
                 </LinearLayout>
 
+
+
             </android.support.v7.widget.CardView>
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:layout_alignParentBottom="true"
-                android:layout_marginLeft="8dp"
-                android:id="@+id/btnShowComment"
-                android:text="Show Comment"
-                android:background="@color/colorPrimary"
-                android:layout_margin="8dp"
-                android:textColor="@android:color/white"/>
+
 
         </LinearLayout>
+
+
 
     </android.support.v4.widget.NestedScrollView>
 

@@ -42,13 +42,13 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class EventDetail extends AppCompatActivity implements RatingDialogListener{
 
-    TextView event_name, event_price, event_description, event_userContact, event_location, event_time, event_date;
+    TextView event_name, event_price, event_description, event_userContact, event_location, event_time, event_date, event_userEmail, event_userCompany;
     ImageView event_image;
     CollapsingToolbarLayout collapsingToolbarLayout;
-    FloatingActionButton btnRating,btnBooking;
-    CounterFab btnCart;
+    FloatingActionButton btnRating,btnBooking,btnMessage,btnProfile;
     ElegantNumberButton numberButton;
     RatingBar ratingBar;
+    Button btnShowComment;
 
     String eventId="";
     String userId="";
@@ -56,8 +56,6 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
     FirebaseDatabase database;
     DatabaseReference event;
     DatabaseReference ratingTbl;
-
-    Button btnShowComment;
 
     Event currentEvent;
 
@@ -91,7 +89,7 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(EventDetail.this,BookingActivity.class);
-                intent.putExtra(Common.INTENT_USER_ID,userId);
+                intent.putExtra(Common.INTENT_EVENT_ID,eventId);
                 startActivity(intent);
             }
         });
@@ -101,11 +99,12 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
         event = database.getReference("Event");
         ratingTbl = database.getReference("Rating");
 
+        ratingBar = (RatingBar) findViewById(R.id.ratingBar);
         numberButton = (ElegantNumberButton) findViewById(R.id.number_button);
-        btnCart = (CounterFab) findViewById(R.id.btnCart);
+
         btnRating = (FloatingActionButton) findViewById(R.id.btn_rating);
 
-        ratingBar = (RatingBar) findViewById(R.id.ratingBar);
+        btnBooking = (FloatingActionButton) findViewById(R.id.btn_booking);
 
         btnRating.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,26 +113,6 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
             }
         });
 
-
-/*        btnCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Database(getBaseContext()).addToCart(new Order(
-                        Common.currentUser.getPhone(),
-                        eventId,
-                        currentEvent.getName(),
-                        numberButton.getNumber(),
-                        currentEvent.getPrice(),
-                        currentEvent.getDiscount(),
-                        currentEvent.getImage()
-                ));
-
-                Toast.makeText(EventDetail.this,"Added to Cart",Toast.LENGTH_SHORT).show();
-            }
-        });*/
-
-        btnCart.setCount(new Database(this).getCountCart(Common.currentUser.getPhone()));
-
         event_description = (TextView) findViewById(R.id.event_description);
         event_name = (TextView) findViewById(R.id.event_name);
         event_price = (TextView) findViewById(R.id.event_price);
@@ -141,6 +120,8 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
         event_location = (TextView) findViewById(R.id.event_location);
         event_time = (TextView) findViewById(R.id.event_time);
         event_userContact = (TextView) findViewById(R.id.event_contact);
+        event_userEmail = (TextView) findViewById(R.id.event_email);
+        event_userCompany = (TextView) findViewById(R.id.event_company);
 
         event_image = (ImageView) findViewById(R.id.img_event);
 
@@ -191,14 +172,19 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
                     Picasso.with(getBaseContext()).load(currentEvent.getImage()).into(event_image);
 
                     collapsingToolbarLayout.setTitle(currentEvent.getName());
-
-                    event_price.setText(currentEvent.getPrice());
+                    if (currentEvent.getBooking().equals("FREE")){
+                        event_price.setVisibility(View.INVISIBLE);
+                    } else if (currentEvent.getBooking().equals("PAID")) {
+                        event_price.setText("RM " + currentEvent.getPrice());
+                    }
                     event_name.setText(currentEvent.getName());
                     event_description.setText(currentEvent.getDescription());
                     event_date.setText(currentEvent.getDate());
                     event_time.setText(currentEvent.getTime());
                     event_location.setText(currentEvent.getLocation());
                     event_userContact.setText(currentEvent.getUserContact());
+                    event_userEmail.setText(currentEvent.getUserEmail());
+                    event_userCompany.setText(currentEvent.getCompanyName());
                 }
             }
 

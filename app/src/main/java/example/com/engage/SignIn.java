@@ -41,7 +41,6 @@ public class SignIn extends AppCompatActivity{
     FirebaseDatabase database;
     DatabaseReference table_user;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +85,8 @@ public class SignIn extends AppCompatActivity{
                     table_user.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
 
                             if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
                                 mDialog.dismiss();
@@ -146,12 +147,17 @@ public class SignIn extends AppCompatActivity{
                 table_user.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.child(edtPhone.getText().toString()).getValue(User.class);
 
-                        if(user.getSecureCode().equals(edtSecureCode.getText().toString()))
-                            Toast.makeText(SignIn.this, "Your password : "+user.getPassword(), Toast.LENGTH_SHORT).show();
-                        else
-                            Toast.makeText(SignIn.this, "Invalid secure code !", Toast.LENGTH_SHORT).show();
+                        if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
+                            User user = dataSnapshot.child(edtPhone.getText().toString()).getValue(User.class);
+
+                            if (user.getSecureCode().equals(edtSecureCode.getText().toString()))
+                                Toast.makeText(SignIn.this, "Your password : " + user.getPassword(), Toast.LENGTH_SHORT).show();
+                            else
+                                Toast.makeText(SignIn.this, "Invalid secure code !", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(SignIn.this, "User doesn't exist !", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override

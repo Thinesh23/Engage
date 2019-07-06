@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import android.app.AlertDialog;
@@ -72,6 +73,8 @@ import java.util.UUID;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
+import static example.com.engage.Common.Common.currentEvent;
+
 public class EventList extends AppCompatActivity {
 
     RecyclerView recyclerView;
@@ -84,9 +87,10 @@ public class EventList extends AppCompatActivity {
 
     DataSnapshot newSnap;
 
-    MaterialEditText edtName, edtDescription, edtPrice, edtLocation, edtDate, edtTime;
+    MaterialEditText edtName, edtDescription, edtPrice, edtLocation;
     Button btnSelect, btnUpload, btnSetDate, btnSetTime;
 
+    RadioGroup rdiBook;
     RadioButton rdiFree, rdiPaid;
 
     Calendar c;
@@ -287,22 +291,35 @@ public class EventList extends AppCompatActivity {
         edtDescription = add_event_layout.findViewById(R.id.edtDescription);
         edtPrice = add_event_layout.findViewById(R.id.edtPrice);
         edtLocation = add_event_layout.findViewById(R.id.edtLocation);
-        edtDate = add_event_layout.findViewById(R.id.edtDate);
-        edtTime = add_event_layout.findViewById(R.id.edtTime);
         btnUpload = add_event_layout.findViewById(R.id.btnUpload);
         btnSelect = add_event_layout.findViewById(R.id.btnSelect);
         btnSetDate = add_event_layout.findViewById(R.id.btnSetDate);
         btnSetTime = add_event_layout.findViewById(R.id.btnSetTime);
-        rdiFree = add_event_layout.findViewById(R.id.rdiFree);
+        rdiBook = add_event_layout.findViewById(R.id.rdiBook);
         rdiPaid = add_event_layout.findViewById(R.id.rdiPaid);
+        rdiFree = add_event_layout.findViewById(R.id.rdiFree);
 
         if (rdiFree.isChecked()){
-            booking = "FREE";
-
-        } else if (rdiPaid.isChecked()){
-            booking = "PAID";
-            edtPrice.clearFocus();
+            edtPrice.setText("0");
+            edtPrice.setEnabled(false);
         }
+
+
+        rdiBook.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch(checkedId){
+                    case R.id.rdiFree:
+                        booking = "FREE";
+                        edtPrice.setText("0");
+                        edtPrice.setEnabled(false);
+                        break;
+                    case R.id.rdiPaid:
+                        booking = "PAID";
+                        edtPrice.setEnabled(true);
+                }
+            }
+        });
 
         btnSetTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -334,7 +351,7 @@ public class EventList extends AppCompatActivity {
         });
 
         alertDialog.setView(add_event_layout);
-        alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
+        alertDialog.setIcon(R.drawable.ic_event_black_24dp);
 
         //Set button
         alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
@@ -355,6 +372,7 @@ public class EventList extends AppCompatActivity {
                 dialogInterface.dismiss();
             }
         });
+
         alertDialog.show();
     }
 
@@ -366,7 +384,7 @@ public class EventList extends AppCompatActivity {
         tpd = new TimePickerDialog(EventList.this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int hourOfDay, int minutes) {
-                edtTime.setText(hourOfDay + ":" + minutes);
+                btnSetTime.setText(hourOfDay + ":" + minutes);
             }
         }, 0, 0,true);
         tpd.show();
@@ -382,7 +400,7 @@ public class EventList extends AppCompatActivity {
         dpd = new DatePickerDialog(EventList.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                edtDate.setText(year + "-" + (month+1) + "-" + dayOfMonth);
+                btnSetDate.setText(year + "-" + (month+1) + "-" + dayOfMonth);
             }
         },year, month, day);
         dpd.show();
@@ -413,19 +431,21 @@ public class EventList extends AppCompatActivity {
                                     newEvent = new Event();
                                     //set value for newEvent if image uploaded
                                     newEvent.setUserContact(Common.currentUser.getPhone());
+                                    newEvent.setUserEmail(Common.currentUser.getEmail());
                                     newEvent.setDescription(edtDescription.getText().toString());
                                     newEvent.setBooking(booking);
-                                    newEvent.setDate(edtDate.getText().toString());
-                                    newEvent.setTime(edtTime.getText().toString());
+                                    newEvent.setDate(btnSetDate.getText().toString());
+                                    newEvent.setTime(btnSetTime.getText().toString());
                                     newEvent.setLocation(edtLocation.getText().toString());
                                     newEvent.setImage(uri.toString());
                                     newEvent.setMenuId(categoryId);
                                     newEvent.setName(edtName.getText().toString());
                                     if (booking == "FREE") {
-                                        newEvent.setPrice("0");
+                                        newEvent.setPrice(edtPrice.getText().toString());
                                     } else if (booking == "PAID") {
                                         newEvent.setPrice(edtPrice.getText().toString());
                                     }
+                                    newEvent.setCompanyName(Common.currentUser.getCompanyName());
 
                                 }
                             });
@@ -470,19 +490,24 @@ public class EventList extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        newEvent = adapter.getItem(item.getOrder());
-        if (Common.currentUser.getPhone() == newEvent.getUserContact() || Common.currentUser.getIsStaff().equals("true")) {
-            String title = item.getTitle().toString();
-            if (item.getTitle().equals(Common.UPDATE)) {
-                // method to show action when select update this method take to param(key,item)
+
+        String title = item.getTitle().toString();
+        if (item.getTitle().equals(Common.UPDATE)) {
+            // method to show action when select update this method take to param(key,item)
+            if (eventList.orderByChild("userContact").equals(Common.currentUser.getPhone())) {
                 showUpdateEventDialog(adapter.getRef(item.getOrder()).getKey(), adapter.getItem(item.getOrder()));
-            } else if (item.getTitle().equals(Common.DELETE)) {
-                // method to show action when select delete this method take param(key)
-                deleteEvent(adapter.getRef(item.getOrder()).getKey());
+            } else {
+                Toast.makeText(EventList.this, "You are not authorized to do this action", Toast.LENGTH_SHORT).show();
             }
-        } else {
-            Toast.makeText(EventList.this, "You are not authorized to do this action", Toast.LENGTH_SHORT).show();
+        } else if (item.getTitle().equals(Common.DELETE)) {
+            // method to show action when select delete this method take param(key)
+            if (eventList.orderByChild("userContact").equals(Common.currentUser.getPhone()) || Common.currentUser.getIsStaff().equals("true")) {
+                deleteEvent(adapter.getRef(item.getOrder()).getKey());
+            } else {
+                Toast.makeText(EventList.this, "You are not authorized to do this action", Toast.LENGTH_SHORT).show();
+            }
         }
+
         return super.onContextItemSelected(item);
     }
 
@@ -503,23 +528,31 @@ public class EventList extends AppCompatActivity {
         edtDescription = add_new_event_layout.findViewById(R.id.edtDescription);
         edtPrice = add_new_event_layout.findViewById(R.id.edtPrice);
         edtLocation = add_new_event_layout.findViewById(R.id.edtLocation);
-        edtDate = add_new_event_layout.findViewById(R.id.edtDate);
-        edtTime = add_new_event_layout.findViewById(R.id.edtTime);
         btnUpload = add_new_event_layout.findViewById(R.id.btnUpload);
         btnSelect = add_new_event_layout.findViewById(R.id.btnSelect);
         btnSetDate = add_new_event_layout.findViewById(R.id.btnSetDate);
         btnSetTime = add_new_event_layout.findViewById(R.id.btnSetTime);
-        rdiFree = add_new_event_layout.findViewById(R.id.rdiFree);
+        rdiBook = add_new_event_layout.findViewById(R.id.rdiBook);
         rdiPaid = add_new_event_layout.findViewById(R.id.rdiPaid);
+        rdiFree = add_new_event_layout.findViewById(R.id.rdiFree);
 
-        if (rdiFree.isChecked()){
-            booking = "FREE";
-            edtPrice.setFocusable(false);
-            edtPrice.setText("0");
-        } else if (rdiPaid.isChecked()){
-            booking = "PAID";
-            edtPrice.setFocusable(true);
-        }
+
+        rdiBook.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch(checkedId){
+                    case R.id.rdiFree:
+                        booking = "FREE";
+                        edtPrice.setText("0");
+                        edtPrice.setEnabled(false);
+                        break;
+                    case R.id.rdiPaid:
+                        booking = "PAID";
+                        edtPrice.setEnabled(true);
+                        break;
+                }
+            }
+        });
 
         btnSetTime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -549,13 +582,13 @@ public class EventList extends AppCompatActivity {
         }
         edtPrice.setText(item.getPrice());
         edtLocation.setText(item.getLocation());
-        edtDate.setText(item.getDate());
-        edtTime.setText(item.getTime());
+        btnSetDate.setText(item.getDate());
+        btnSetTime.setText(item.getTime());
 
 
         // set layout and icon for dialog
         alertDialog.setView(add_new_event_layout);
-        alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
+        alertDialog.setIcon(R.drawable.ic_event_black_24dp);
 
         // event for button
         btnSelect.setOnClickListener(new View.OnClickListener() {
@@ -583,10 +616,12 @@ public class EventList extends AppCompatActivity {
                 item.setPrice(edtPrice.getText().toString());
                 item.setLocation(edtLocation.getText().toString());
                 item.setUserContact(Common.currentUser.getPhone());
+                item.setUserEmail(Common.currentUser.getEmail());
                 item.setBooking(booking);
-                item.setDate(edtDate.getText().toString());
-                item.setTime(edtTime.getText().toString());
+                item.setDate(btnSetDate.getText().toString());
+                item.setTime(btnSetTime.getText().toString());
                 item.setDescription(edtDescription.getText().toString());
+                item.setCompanyName(Common.currentUser.getCompanyName());
 
                 eventList.child(key).setValue(item);
                 //eventList.push().setValue(newEvent);
@@ -796,6 +831,7 @@ public class EventList extends AppCompatActivity {
                     public void onClick(View view, int position, boolean isLongClick) {
                         Intent eventDetail = new Intent (EventList.this,EventDetail.class);
                         eventDetail.putExtra("eventId",adapter.getRef(position).getKey());
+                        currentEvent = model;
                         startActivity(eventDetail);
                     }
                 });

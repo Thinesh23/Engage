@@ -7,25 +7,30 @@ public class Event {
     private String price;
     private String booking;
     private String userContact;
+    private String userEmail;
     private String location;
     private String date;
     private String time;
     private String menuId;
+    private String companyName;
+
 
     public Event() {
     }
 
-    public Event(String name, String image, String description, String price, String booking, String location, String userContact, String date, String time, String menuId) {
+    public Event(String name, String image, String description, String price, String booking, String location, String userContact, String userEmail, String date, String time, String menuId, String companyName) {
         this.name = name;
         this.image = image;
         this.description = description;
         this.price = price;
         this.booking = booking;
         this.userContact = userContact;
+        this.userEmail = userEmail;
         this.location = location;
         this.date = date;
         this.time = time;
         this.menuId = menuId;
+        this.companyName = companyName;
     }
 
     public String getBooking() { return this.booking; }
@@ -45,6 +50,14 @@ public class Event {
     public void setDate(String date) { this.date = date; }
 
     public String getTime() { return this.time; }
+
+    public String getUserEmail() {
+        return userEmail;
+    }
+
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
+    }
 
     public void setTime(String time) { this.time = time; }
 
@@ -86,5 +99,13 @@ public class Event {
 
     public void setMenuId(String menuId) {
         this.menuId = menuId;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

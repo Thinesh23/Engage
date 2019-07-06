@@ -1,120 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    app:cardElevation="4dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="vertical"
     android:background="@drawable/engagebackground3"
-
     tools:context=".SignUp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="97dp"
-        android:orientation="vertical">
-
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edtPhone"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Phone Number"
-            android:inputType="phone"
-            android:text=""
-            android:textColorHint="@android:color/white"
-            android:textSize="34sp"
-            app:met_baseColor="@android:color/white"
-            app:met_floatingLabel="highlight"
-            app:met_maxCharacters="11"
-            app:met_primaryColor="@android:color/white"
-            app:met_singleLineEllipsis="true" />
+            android:layout_height="wrap_content">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edtName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Name"
-            android:inputType="textPersonName"
-            android:text=""
-            android:textColorHint="@android:color/white"
-            android:textSize="34sp"
-            app:met_baseColor="@android:color/white"
-            app:met_floatingLabel="highlight"
-            app:met_maxCharacters="11"
-            app:met_primaryColor="@android:color/white"
-            app:met_singleLineEllipsis="true" />
-
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edtPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:text=""
-            android:textColorHint="@android:color/white"
-            android:textSize="34sp"
-            app:met_baseColor="@android:color/white"
-            app:met_floatingLabel="highlight"
-            app:met_maxCharacters="11"
-            app:met_primaryColor="@android:color/white"
-            app:met_singleLineEllipsis="true" />
-
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edtSecureCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Secure Code"
-            android:inputType="text"
-            android:text=""
-            android:textColorHint="@android:color/white"
-            android:textSize="34sp"
-            app:met_baseColor="@android:color/white"
-            app:met_floatingLabel="highlight"
-            app:met_maxCharacters="11"
-            app:met_primaryColor="@android:color/white"
-            app:met_singleLineEllipsis="true" />
-
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/rdiOrganizer"
-                android:layout_width="192dp"
-                android:layout_height="wrap_content"
-                android:text="Organizer"
-                android:textColor="@android:color/white"
-                android:textSize="25sp" />
-
-            <RadioButton
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/MyRadioButton"
-                android:textColor="@android:color/white"
-                android:textSize="25sp"
-                android:text="User"
-                android:checked="true"
-                android:id="@+id/rdiUser"/>
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_weight="2">
+
+                    <com.rengwuxian.materialedittext.MaterialEditText
+                        android:id="@+id/edtFirstName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="First Name"
+                        android:layout_weight="1"
+                        android:inputType="textPersonName"
+                        android:text=""
+                        android:textColorHint="@android:color/white"
+                        android:textSize="34sp"
+                        app:met_baseColor="@android:color/white"
+                        app:met_floatingLabel="highlight"
+                        app:met_maxCharacters="11"
+                        app:met_primaryColor="@android:color/white"
+                        app:met_singleLineEllipsis="true" />
+
+                    <com.rengwuxian.materialedittext.MaterialEditText
+                        android:id="@+id/edtLastName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Last Name"
+                        android:layout_weight="1"
+                        android:inputType="textPersonName"
+                        android:text=""
+                        android:textColorHint="@android:color/white"
+                        android:textSize="34sp"
+                        app:met_baseColor="@android:color/white"
+                        app:met_floatingLabel="highlight"
+                        app:met_maxCharacters="11"
+                        app:met_primaryColor="@android:color/white"
+                        app:met_singleLineEllipsis="true" />
+
+                </LinearLayout>
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/edtPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Phone Number"
+                    android:inputType="phone"
+                    android:text=""
+                    android:textColorHint="@android:color/white"
+                    android:textSize="34sp"
+                    app:met_baseColor="@android:color/white"
+                    app:met_floatingLabel="highlight"
+                    app:met_maxCharacters="11"
+                    app:met_primaryColor="@android:color/white"
+                    app:met_singleLineEllipsis="true" />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/edtPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Password"
+                    android:inputType="textPassword"
+                    android:text=""
+                    android:textColorHint="@android:color/white"
+                    android:textSize="34sp"
+                    app:met_baseColor="@android:color/white"
+                    app:met_floatingLabel="highlight"
+                    app:met_maxCharacters="11"
+                    app:met_primaryColor="@android:color/white"
+                    app:met_singleLineEllipsis="true" />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/edtEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Email Address"
+                    android:inputType="textEmailAddress"
+                    android:text=""
+                    android:textColorHint="@android:color/white"
+                    android:textSize="34sp"
+                    app:met_baseColor="@android:color/white"
+                    app:met_floatingLabel="highlight"
+                    app:met_primaryColor="@android:color/white"
+                    app:met_singleLineEllipsis="true" />
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/edtSecureCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Secure Code"
+                    android:inputType="text"
+                    android:text=""
+                    android:textColorHint="@android:color/white"
+                    android:textSize="34sp"
+                    app:met_baseColor="@android:color/white"
+                    app:met_floatingLabel="highlight"
+                    app:met_maxCharacters="11"
+                    app:met_primaryColor="@android:color/white"
+                    app:met_singleLineEllipsis="true" />
 
 
-        </RadioGroup>
 
-    </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="8dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="8dp"
-        android:id="@+id/btnSignUp"
-        android:background="@color/btnSignUp"
-        android:text="SIGN UP"
-        android:layout_margin="8dp"
-        android:textColor="@android:color/white" />
+                    <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:id="@+id/user_type">
 
-</RelativeLayout>
+                        <RadioButton
+                            android:id="@+id/rdiOrganizer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Organizer"
+                            android:checked="true"
+                            android:textColor="@android:color/white"
+                            android:textSize="25sp" />
+
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/MyRadioButton"
+                            android:textColor="@android:color/white"
+                            android:textSize="25sp"
+                            android:text="User"
+                            android:id="@+id/rdiUser"/>
+
+
+                    </RadioGroup>
+
+                    <com.rengwuxian.materialedittext.MaterialEditText
+                        android:id="@+id/edtCompanyName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:hint="Company Name"
+                        android:inputType="text"
+                        android:text=""
+                        android:textColorHint="@android:color/white"
+                        android:textSize="34sp"
+                        app:met_baseColor="@android:color/white"
+                        app:met_floatingLabel="highlight"
+                        app:met_maxCharacters="11"
+                        app:met_primaryColor="@android:color/white"
+                        app:met_singleLineEllipsis="true" />
+
+                </LinearLayout>
+
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginLeft="8dp"
+                    android:id="@+id/btnSignUp"
+                    android:background="@color/btnSignUp"
+                    android:text="SIGN UP"
+                    android:layout_margin="8dp"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+
+
+        </RelativeLayout>
+
+</ScrollView>

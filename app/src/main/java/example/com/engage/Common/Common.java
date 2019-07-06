@@ -19,6 +19,7 @@ import java.util.Locale;
 
 public class Common {
     public static User currentUser;
+    public static Event currentEvent;
 
     public static String PHONE_TEXT = "userPhone";
 
