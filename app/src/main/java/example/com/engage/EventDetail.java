@@ -46,7 +46,6 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
     ImageView event_image;
     CollapsingToolbarLayout collapsingToolbarLayout;
     FloatingActionButton btnRating,btnBooking,btnMessage,btnProfile;
-    ElegantNumberButton numberButton;
     RatingBar ratingBar;
     Button btnShowComment;
 
@@ -84,15 +83,35 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
             }
         });
 
+        btnProfile = (FloatingActionButton) findViewById(R.id.btn_show_booking);
+        if(Common.currentUser.getPhone().equals(Common.currentEvent.getUserContact())){
+            btnProfile.show();
+            btnProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(EventDetail.this,ShowBooking.class);
+                    intent.putExtra(Common.INTENT_EVENT_ID,eventId);
+                    startActivity(intent);
+                }
+            });
+        } else {
+            btnProfile.hide();
+        }
         btnBooking = (FloatingActionButton) findViewById(R.id.btn_booking);
-        btnBooking.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(EventDetail.this,BookingActivity.class);
-                intent.putExtra(Common.INTENT_EVENT_ID,eventId);
-                startActivity(intent);
-            }
-        });
+        if(Common.currentUser.getPhone().equals(Common.currentEvent.getUserContact())){
+            btnBooking.hide();
+        } else {
+            btnBooking.show();
+            btnBooking.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(EventDetail.this,BookingActivity.class);
+                    intent.putExtra(Common.INTENT_EVENT_ID,eventId);
+                    startActivity(intent);
+                }
+            });
+        }
+
 
 
         database = FirebaseDatabase.getInstance();
@@ -100,7 +119,6 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
         ratingTbl = database.getReference("Rating");
 
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
-        numberButton = (ElegantNumberButton) findViewById(R.id.number_button);
 
         btnRating = (FloatingActionButton) findViewById(R.id.btn_rating);
 

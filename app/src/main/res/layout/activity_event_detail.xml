@@ -119,19 +119,6 @@
                             android:textStyle="bold" />
 
                     </LinearLayout>
-
-                    <com.cepheuen.elegantnumberbutton.view.ElegantNumberButton
-                        android:id="@+id/number_button"
-                        android:layout_width="100dp"
-                        android:layout_height="30dp"
-                        android:layout_marginBottom="18dp"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginTop="8dp"
-                        app:backGroundColor="@color/colorAccent"
-                        app:finalNumber="20"
-                        app:initialNumber="1"
-                        app:textSize="8sp" />
-
                 </LinearLayout>
 
 
@@ -271,11 +258,11 @@
                             app:useCompatPadding="true" />
 
                         <android.support.design.widget.FloatingActionButton
-                            android:id="@+id/btn_profile"
+                            android:id="@+id/btn_show_booking"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:backgroundTint="@color/colorAccent"
-                            android:src="@drawable/ic_system_update_black_24dp"
+                            android:src="@drawable/ic_person_black_24dp"
                             app:elevation="6dp"
                             app:layout_anchor="@id/app_bar_layout"
                             app:pressedTranslationZ="12dp"

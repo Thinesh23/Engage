@@ -93,7 +93,6 @@ public class SignUp extends AppCompatActivity {
                                         edtLastName.getText().toString(),
                                         edtPassword.getText().toString(),
                                         edtEmail.getText().toString(),
-                                        edtPhone.getText().toString(),
                                         edtSecureCode.getText().toString(),
                                         userOrganizer,
                                         edtCompanyName.getText().toString());

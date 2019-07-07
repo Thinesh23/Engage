@@ -9,6 +9,7 @@ import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -37,6 +38,7 @@ import example.com.engage.Database.Database;
 import example.com.engage.Interface.ItemClickListener;
 import example.com.engage.Model.Category;
 import example.com.engage.Model.Event;
+import example.com.engage.Model.Request;
 import example.com.engage.Model.Token;
 import example.com.engage.Model.User;
 import example.com.engage.ViewHolder.MenuViewHolder;
@@ -73,7 +75,7 @@ public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     FirebaseDatabase database;
-    DatabaseReference category,event;
+    DatabaseReference category,event,request;
     FirebaseStorage storage;
     StorageReference storageReference;
 
@@ -85,10 +87,11 @@ public class Home extends AppCompatActivity
     FirebaseRecyclerAdapter<Category,MenuViewHolder> adapter;
 
     SwipeRefreshLayout swipeRefreshLayout;
-
     //Add New Menu Layout
     MaterialEditText edtName;
     Button btnUpload,btnSelect;
+
+    Request currentRequest;
 
 
     Category newCategory;
@@ -117,6 +120,7 @@ public class Home extends AppCompatActivity
         database = FirebaseDatabase.getInstance();
         category = database.getReference("Category");
         event = database.getReference("Event");
+        request = database.getReference("Request");
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
@@ -172,9 +176,9 @@ public class Home extends AppCompatActivity
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (Common.isConnectedToInternet(getBaseContext()))
+                if (Common.isConnectedToInternet(getBaseContext())) {
                     loadMenu();
-                else {
+                }else {
                     Toast.makeText(getBaseContext(), "Please check your connection !!", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -185,9 +189,9 @@ public class Home extends AppCompatActivity
         swipeRefreshLayout.post(new Runnable() {
             @Override
             public void run() {
-                if (Common.isConnectedToInternet(getBaseContext()))
+                if (Common.isConnectedToInternet(getBaseContext())) {
                     loadMenu();
-                else {
+                } else {
                     Toast.makeText(getBaseContext(), "Please check your connection !!", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -530,7 +534,7 @@ public class Home extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)){
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
         }
     }
 
@@ -542,8 +546,11 @@ public class Home extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        if(item.getItemId() == R.id.refresh)
+        if(item.getItemId() == R.id.refresh) {
             loadMenu();
+        } else if (item.getItemId() == R.id.action_message){
+
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -555,15 +562,12 @@ public class Home extends AppCompatActivity
 
         if (id == R.id.nav_menu) {
 
-        } else if (id == R.id.nav_cart){
-            //Intent cartIntent = new Intent(Home.this,Cart.class);
-            //startActivity(cartIntent);
-        } else if (id == R.id.nav_orders){
-            //Intent orderIntent = new Intent(Home.this,OrderStatus.class);
-            //startActivity(orderIntent);
+        } else if (id == R.id.nav_booking_history){
+            Intent historyIntent = new Intent(Home.this,BookingHistory.class);
+            startActivity(historyIntent);
         } else if (id == R.id.nav_log_out){
             Paper.book().destroy();
-
+            Common.currentUser = null;
             Intent signIn = new Intent(Home.this, SignIn.class);
             signIn.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(signIn);
@@ -592,7 +596,7 @@ public class Home extends AppCompatActivity
         final MaterialEditText updateLastName = (MaterialEditText)layout_home.findViewById(R.id.updateLastName);
         final MaterialEditText updateEmail = (MaterialEditText)layout_home.findViewById(R.id.updateEmail);
         final MaterialEditText updateCompanyName = (MaterialEditText)layout_home.findViewById(R.id.updateCompanyName);
-        final DatabaseReference table_user = database.getReference("User");
+        final DatabaseReference table_request = database.getReference("Request");
         final DatabaseReference table_event = database.getReference("Event");
 
         //Set default
@@ -600,7 +604,6 @@ public class Home extends AppCompatActivity
         updateLastName.setText(Common.currentUser.getLastName());
         updateEmail.setText(Common.currentUser.getEmail());
         updateCompanyName.setText(Common.currentUser.getCompanyName());
-        final String oldNumber = Common.currentUser.getPhone();
         alertDialog.setView(layout_home);
 
         alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
@@ -637,6 +640,21 @@ public class Home extends AppCompatActivity
                             for(DataSnapshot postSnapshot:dataSnapshot.getChildren()){
                                 postSnapshot.child("userEmail").getRef().setValue(Common.currentUser.getEmail());
                                 postSnapshot.child("companyName").getRef().setValue(Common.currentUser.getCompanyName());
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    table_request.orderByChild("organizerPhone").equalTo(Common.currentUser.getPhone()).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for(DataSnapshot postSnapshot:dataSnapshot.getChildren()){
+                                postSnapshot.child("organizerEmail").getRef().setValue(Common.currentUser.getEmail());
+                                postSnapshot.child("organizerCompany").getRef().setValue(Common.currentUser.getCompanyName());
                             }
                         }
 

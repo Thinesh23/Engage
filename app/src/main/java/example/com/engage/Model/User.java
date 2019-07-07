@@ -15,7 +15,7 @@ public class User {
     public User() {
     }
 
-    public User(String firstname, String lastname, String password, String email, String phone, String secureCode, String organizer, String companyName) {
+    public User(String firstname, String lastname, String password, String email, String secureCode, String organizer, String companyName) {
         FirstName = firstname;
         LastName = lastname;
         Password = password;

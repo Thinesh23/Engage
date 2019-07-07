@@ -38,6 +38,7 @@ import example.com.engage.Database.Database;
 import example.com.engage.Interface.ItemClickListener;
 import example.com.engage.Model.Event;
 import example.com.engage.Model.Order;
+import example.com.engage.Model.Request;
 import example.com.engage.ViewHolder.EventViewHolder;
 
 import com.andremion.counterfab.CounterFab;
@@ -65,8 +66,10 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -174,7 +177,7 @@ public class EventList extends AppCompatActivity {
         localDB = new Database(this);
 
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-        if (Common.currentUser.getIsOrganizer().equals("true") || Common.currentUser.getIsStaff().equals("true")) {
+        if (Common.currentUser.getIsOrganizer().equals("true")) {
             fab.show();
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -299,12 +302,6 @@ public class EventList extends AppCompatActivity {
         rdiPaid = add_event_layout.findViewById(R.id.rdiPaid);
         rdiFree = add_event_layout.findViewById(R.id.rdiFree);
 
-        if (rdiFree.isChecked()){
-            edtPrice.setText("0");
-            edtPrice.setEnabled(false);
-        }
-
-
         rdiBook.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -403,6 +400,7 @@ public class EventList extends AppCompatActivity {
                 btnSetDate.setText(year + "-" + (month+1) + "-" + dayOfMonth);
             }
         },year, month, day);
+        dpd.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         dpd.show();
     }
 
@@ -441,7 +439,7 @@ public class EventList extends AppCompatActivity {
                                     newEvent.setMenuId(categoryId);
                                     newEvent.setName(edtName.getText().toString());
                                     if (booking == "FREE") {
-                                        newEvent.setPrice(edtPrice.getText().toString());
+                                        newEvent.setPrice("0");
                                     } else if (booking == "PAID") {
                                         newEvent.setPrice(edtPrice.getText().toString());
                                     }
@@ -489,24 +487,41 @@ public class EventList extends AppCompatActivity {
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(final MenuItem item) {
 
         String title = item.getTitle().toString();
-        if (item.getTitle().equals(Common.UPDATE)) {
             // method to show action when select update this method take to param(key,item)
-            if (eventList.orderByChild("userContact").equals(Common.currentUser.getPhone())) {
-                showUpdateEventDialog(adapter.getRef(item.getOrder()).getKey(), adapter.getItem(item.getOrder()));
-            } else {
-                Toast.makeText(EventList.this, "You are not authorized to do this action", Toast.LENGTH_SHORT).show();
-            }
-        } else if (item.getTitle().equals(Common.DELETE)) {
-            // method to show action when select delete this method take param(key)
-            if (eventList.orderByChild("userContact").equals(Common.currentUser.getPhone()) || Common.currentUser.getIsStaff().equals("true")) {
-                deleteEvent(adapter.getRef(item.getOrder()).getKey());
-            } else {
-                Toast.makeText(EventList.this, "You are not authorized to do this action", Toast.LENGTH_SHORT).show();
-            }
-        }
+            Query query = eventList.orderByChild("userContact").equalTo(Common.currentUser.getPhone());
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()){
+                        for (DataSnapshot data : dataSnapshot.getChildren()){
+                            if(item.getTitle().equals(Common.UPDATE)){
+                                if (data.getValue(Event.class).getUserContact().equals(Common.currentUser.getPhone())){
+                                    showUpdateEventDialog(adapter.getRef(item.getOrder()).getKey(), adapter.getItem(item.getOrder()));
+                                } else {
+                                    Toast.makeText(EventList.this, "You are not authorized to do this action", Toast.LENGTH_SHORT).show();
+                                }
+                            } else if (item.getTitle().equals(Common.DELETE)){
+                                // method to show action when select delete this method take param(key)
+                                if (data.getValue(Event.class).getUserContact().equals(Common.currentUser.getPhone()) || Common.currentUser.getIsStaff().equals("true")) {
+                                    deleteEvent(adapter.getRef(item.getOrder()).getKey());
+                                } else {
+                                    Toast.makeText(EventList.this, "You are not authorized to do this action", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
 
         return super.onContextItemSelected(item);
     }
@@ -759,39 +774,10 @@ public class EventList extends AppCompatActivity {
         adapter = new FirebaseRecyclerAdapter<Event, EventViewHolder>(eventOptions) {
             @Override
             protected void onBindViewHolder(@NonNull final EventViewHolder viewHolder, final int position, @NonNull final Event model) {
+
                 viewHolder.event_name.setText(model.getName());
                 viewHolder.event_booking.setText(String.format("%s",model.getBooking().toString()));
                 Picasso.with(getBaseContext()).load(model.getImage()).into(viewHolder.event_image);
-
-/*                //Quick cart
-                viewHolder.quick_cart.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        boolean isExists =new Database(getBaseContext()).checkFoodExists(adapter.getRef(position).getKey(),Common.currentUser.getPhone());
-                        if(!isExists) {
-                            new Database(getBaseContext()).addToCart(new Order(
-                                    Common.currentUser.getPhone(),
-                                    adapter.getRef(position).getKey(),
-                                    model.getName(),
-                                    "1",
-                                    model.getPrice(),
-                                    model.getDiscount(),
-                                    model.getImage()
-                            ));
-                        } else {
-                            new Database(getBaseContext()).increaseCart(Common.currentUser.getPhone(),adapter.getRef(position).getKey());
-                        }
-
-                        Toast.makeText(EventList.this, "Added to Cart", Toast.LENGTH_SHORT).show();
-                    }
-                });*/
-
-
-/*
-                //Add Favourites
-                if(localDB.isFavourite(adapter.getRef(position).getKey(),Common.currentUser.getPhone()))
-                    viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_black_24dp);
-*/
 
                 //Click to share
                 viewHolder.share_image.setOnClickListener(new View.OnClickListener() {
@@ -802,28 +788,6 @@ public class EventList extends AppCompatActivity {
                                 .into(target);
                     }
                 });
-
-                //Click to change state of Favourites
-/*                viewHolder.fav_image.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public String toString() {
-                        return "$classname{}";
-                    }
-
-                    @Override
-                    public void onClick(View v) {
-                        if(!localDB.isFavourite(adapter.getRef(position).getKey(),Common.currentUser.getPhone())){
-                            localDB.addToFavourites(adapter.getRef(position).getKey(),Common.currentUser.getPhone());
-                            viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_black_24dp);
-                            Toast.makeText(EventList.this, ""+model.getName()+" was added to Favorites", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            localDB.removeFromFavourites(adapter.getRef(position).getKey(),Common.currentUser.getPhone());
-                            viewHolder.fav_image.setImageResource(R.drawable.ic_favorite_border_black_24dp);
-                            Toast.makeText(EventList.this, ""+model.getName()+" was removed from Favorites", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });*/
 
                 final Event local = model;
                viewHolder.setItemClickListener(new ItemClickListener() {

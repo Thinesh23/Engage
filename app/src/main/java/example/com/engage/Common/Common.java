@@ -25,6 +25,7 @@ public class Common {
 
     public static final String INTENT_EVENT_ID = "eventId";
     public static final String INTENT_USER_ID = "userId";
+    public static final String INTENT_BOOKING_ID = "bookingId";
 
     public static String restaurantSelected = "";
 

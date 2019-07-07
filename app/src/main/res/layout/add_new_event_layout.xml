@@ -96,6 +96,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="PAID"
+                        android:checked="true"
                         android:theme="@style/MyRadioButton"
                         android:textColor="@android:color/black"
                         android:textSize="20sp" />
@@ -107,7 +108,6 @@
                         android:textColor="@android:color/black"
                         android:textSize="20sp"
                         android:text="FREE"
-                        android:checked="true"
                         android:id="@+id/rdiFree"/>
 
                 </RadioGroup>

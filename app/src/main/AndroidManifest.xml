@@ -37,7 +37,9 @@
         <activity android:name=".EventList" />
         <activity android:name=".EventDetail" />
         <activity android:name=".ShowComment" />
+        <activity android:name=".ShowBooking" />
         <activity android:name=".BookingActivity" />
+        <activity android:name=".BookingHistory" />
 
         <service android:name=".Service.MyFirebaseIdService">
             <intent-filter>
