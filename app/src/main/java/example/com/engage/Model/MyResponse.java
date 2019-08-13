@@ -2,6 +2,8 @@ package example.com.engage.Model;
 
 import java.util.List;
 
+import javax.xml.transform.Result;
+
 public class MyResponse {
     public long multicat_id;
     public int success;

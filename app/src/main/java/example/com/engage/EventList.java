@@ -1,18 +1,14 @@
 package example.com.engage;
 
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.ParseException;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,37 +16,26 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TimePicker;
 import android.widget.Toast;
-import android.app.AlertDialog;
 
 import example.com.engage.Common.Common;
-import example.com.engage.Database.Database;
 import example.com.engage.Interface.ItemClickListener;
 import example.com.engage.Model.Event;
-import example.com.engage.Model.Order;
-import example.com.engage.Model.Request;
-import example.com.engage.ViewHolder.EventViewHolder;
+import example.com.engage.Model.User;
+import example.com.engage.ViewHolder.CompanyViewHolder;
 
-import com.andremion.counterfab.CounterFab;
 import com.facebook.CallbackManager;
-import com.facebook.share.Share;
 import com.facebook.share.model.SharePhoto;
 import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -58,25 +43,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-import static example.com.engage.Common.Common.currentEvent;
+import static example.com.engage.Common.Common.currentCompany;
 
 public class EventList extends AppCompatActivity {
 
@@ -84,11 +64,13 @@ public class EventList extends AppCompatActivity {
     RecyclerView.LayoutManager layoutManager;
 
     FirebaseDatabase database;
-    DatabaseReference eventList;
+    DatabaseReference companyList;
     FirebaseStorage storage;
     StorageReference storageReference;
 
     DataSnapshot newSnap;
+
+    String newEventId = "";
 
     MaterialEditText edtName, edtDescription, edtPrice, edtLocation;
     Button btnSelect, btnUpload, btnSetDate, btnSetTime;
@@ -105,19 +87,14 @@ public class EventList extends AppCompatActivity {
 
     String categoryId = "";
     String booking;
-    FirebaseRecyclerAdapter<Event,EventViewHolder> adapter;
-    FirebaseRecyclerAdapter<Event,EventViewHolder> searchAdapter;
+    FirebaseRecyclerAdapter<User,CompanyViewHolder> adapter;
+    FirebaseRecyclerAdapter<User,CompanyViewHolder> searchAdapter;
     List<String> suggestList = new ArrayList<>();
     MaterialSearchBar materialSearchBar;
-
-    //Favourites
-    Database localDB;
 
     //Facebook Share
     CallbackManager callbackManager;
     ShareDialog shareDialog;
-
-    FloatingActionButton fab;
 
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -169,25 +146,9 @@ public class EventList extends AppCompatActivity {
 
         //Firebase
         database = FirebaseDatabase.getInstance();
-        eventList = database.getReference("Event");
+        companyList = database.getReference("User");
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-
-        //Local DB
-        localDB = new Database(this);
-
-        FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-        if (Common.currentUser.getIsOrganizer().equals("true")) {
-            fab.show();
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showAddEventDialog();
-                }
-            });
-        } else {
-            fab.hide();
-        }
 
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
@@ -281,424 +242,6 @@ public class EventList extends AppCompatActivity {
 
     }
 
-
-    private void showAddEventDialog(){
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(EventList.this);
-        alertDialog.setTitle("Add new Event");
-        alertDialog.setMessage("Please fill full information");
-
-        LayoutInflater inflater = this.getLayoutInflater();
-        View add_event_layout = inflater.inflate(R.layout.add_new_event_layout, null);
-
-        edtName = add_event_layout.findViewById(R.id.edtName);
-        edtDescription = add_event_layout.findViewById(R.id.edtDescription);
-        edtPrice = add_event_layout.findViewById(R.id.edtPrice);
-        edtLocation = add_event_layout.findViewById(R.id.edtLocation);
-        btnUpload = add_event_layout.findViewById(R.id.btnUpload);
-        btnSelect = add_event_layout.findViewById(R.id.btnSelect);
-        btnSetDate = add_event_layout.findViewById(R.id.btnSetDate);
-        btnSetTime = add_event_layout.findViewById(R.id.btnSetTime);
-        rdiBook = add_event_layout.findViewById(R.id.rdiBook);
-        rdiPaid = add_event_layout.findViewById(R.id.rdiPaid);
-        rdiFree = add_event_layout.findViewById(R.id.rdiFree);
-
-        rdiBook.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
-                    case R.id.rdiFree:
-                        booking = "FREE";
-                        edtPrice.setText("0");
-                        edtPrice.setEnabled(false);
-                        break;
-                    case R.id.rdiPaid:
-                        booking = "PAID";
-                        edtPrice.setEnabled(true);
-                }
-            }
-        });
-
-        btnSetTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setTime();
-            }
-        });
-
-        btnSetDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setDate();
-            }
-        });
-
-        //Event for button
-        btnSelect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view){
-                chooseImage();
-            }
-        });
-
-        btnUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uploadImage();
-            }
-        });
-
-        alertDialog.setView(add_event_layout);
-        alertDialog.setIcon(R.drawable.ic_event_black_24dp);
-
-        //Set button
-        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                if (newEvent != null) {
-                    eventList.push().setValue(newEvent);
-                    Snackbar.make(swipeRefreshLayout, "New Event" + newEvent.getName() + " was added",
-                            Snackbar.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-
-        alertDialog.show();
-    }
-
-    private void setTime(){
-        c = Calendar.getInstance();
-        int hour = c.get(Calendar.HOUR);
-        int minute = c.get(Calendar.MINUTE);
-
-        tpd = new TimePickerDialog(EventList.this, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int hourOfDay, int minutes) {
-                btnSetTime.setText(hourOfDay + ":" + minutes);
-            }
-        }, 0, 0,true);
-        tpd.show();
-
-    }
-
-    private void setDate(){
-        c = Calendar.getInstance();
-        int day = c.get(Calendar.DAY_OF_MONTH);
-        int month = c.get(Calendar.MONTH);
-        int year = c.get(Calendar.YEAR);
-
-        dpd = new DatePickerDialog(EventList.this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                btnSetDate.setText(year + "-" + (month+1) + "-" + dayOfMonth);
-            }
-        },year, month, day);
-        dpd.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
-        dpd.show();
-    }
-
-    private void uploadImage() {
-        if (saveUri != null) {
-            final ProgressDialog mDialog = new ProgressDialog(this);
-            mDialog.setMessage("Uploading...");
-            mDialog.show();
-
-            // set image name
-            String imageName = UUID.randomUUID().toString();
-            // set folder
-            final StorageReference imageFolder = storageReference.child("images/" + imageName);
-            // uploading image to folder
-            imageFolder.putFile(saveUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            mDialog.dismiss();
-                            Toast.makeText(EventList.this, "Uploaded!!!", Toast.LENGTH_SHORT).show();
-                            // set value for new Category if image uploaded
-                            // and we can get download link 'uri'
-                            imageFolder.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    newEvent = new Event();
-                                    //set value for newEvent if image uploaded
-                                    newEvent.setUserContact(Common.currentUser.getPhone());
-                                    newEvent.setUserEmail(Common.currentUser.getEmail());
-                                    newEvent.setDescription(edtDescription.getText().toString());
-                                    newEvent.setBooking(booking);
-                                    newEvent.setDate(btnSetDate.getText().toString());
-                                    newEvent.setTime(btnSetTime.getText().toString());
-                                    newEvent.setLocation(edtLocation.getText().toString());
-                                    newEvent.setImage(uri.toString());
-                                    newEvent.setMenuId(categoryId);
-                                    newEvent.setName(edtName.getText().toString());
-                                    if (booking == "FREE") {
-                                        newEvent.setPrice("0");
-                                    } else if (booking == "PAID") {
-                                        newEvent.setPrice(edtPrice.getText().toString());
-                                    }
-                                    newEvent.setCompanyName(Common.currentUser.getCompanyName());
-
-                                }
-                            });
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            mDialog.dismiss();
-                            Toast.makeText(EventList.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            // don't worry about this error
-                            double progress = (100.0 * taskSnapshot.getBytesTransferred() /
-                                    taskSnapshot.getTotalByteCount());
-                            mDialog.setMessage("Uploaded " + progress + "%");
-                        }
-                    });
-        }
-    }
-
-    private void chooseImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), Common.PICK_IMAGE_REQUEST);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Common.PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null)
-        {
-            saveUri = data.getData();
-            btnSelect.setText("Image Selected !");
-        }
-    }
-
-    @Override
-    public boolean onContextItemSelected(final MenuItem item) {
-
-        String title = item.getTitle().toString();
-            // method to show action when select update this method take to param(key,item)
-            Query query = eventList.orderByChild("userContact").equalTo(Common.currentUser.getPhone());
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()){
-                        for (DataSnapshot data : dataSnapshot.getChildren()){
-                            if(item.getTitle().equals(Common.UPDATE)){
-                                if (data.getValue(Event.class).getUserContact().equals(Common.currentUser.getPhone())){
-                                    showUpdateEventDialog(adapter.getRef(item.getOrder()).getKey(), adapter.getItem(item.getOrder()));
-                                } else {
-                                    Toast.makeText(EventList.this, "You are not authorized to do this action", Toast.LENGTH_SHORT).show();
-                                }
-                            } else if (item.getTitle().equals(Common.DELETE)){
-                                // method to show action when select delete this method take param(key)
-                                if (data.getValue(Event.class).getUserContact().equals(Common.currentUser.getPhone()) || Common.currentUser.getIsStaff().equals("true")) {
-                                    deleteEvent(adapter.getRef(item.getOrder()).getKey());
-                                } else {
-                                    Toast.makeText(EventList.this, "You are not authorized to do this action", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                        }
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-
-
-        return super.onContextItemSelected(item);
-    }
-
-    private void deleteEvent(String key) {
-        eventList.child(key).removeValue();
-    }
-
-    private void showUpdateEventDialog(final String key, final Event item) {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(EventList.this);
-        alertDialog.setTitle("Edit Event");
-        alertDialog.setMessage("Please fill full information");
-
-        // inflating layout
-        LayoutInflater inflater = this.getLayoutInflater();
-        View add_new_event_layout = inflater.inflate(R.layout.add_new_event_layout, null);
-
-        edtName = add_new_event_layout.findViewById(R.id.edtName);
-        edtDescription = add_new_event_layout.findViewById(R.id.edtDescription);
-        edtPrice = add_new_event_layout.findViewById(R.id.edtPrice);
-        edtLocation = add_new_event_layout.findViewById(R.id.edtLocation);
-        btnUpload = add_new_event_layout.findViewById(R.id.btnUpload);
-        btnSelect = add_new_event_layout.findViewById(R.id.btnSelect);
-        btnSetDate = add_new_event_layout.findViewById(R.id.btnSetDate);
-        btnSetTime = add_new_event_layout.findViewById(R.id.btnSetTime);
-        rdiBook = add_new_event_layout.findViewById(R.id.rdiBook);
-        rdiPaid = add_new_event_layout.findViewById(R.id.rdiPaid);
-        rdiFree = add_new_event_layout.findViewById(R.id.rdiFree);
-
-
-        rdiBook.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
-                    case R.id.rdiFree:
-                        booking = "FREE";
-                        edtPrice.setText("0");
-                        edtPrice.setEnabled(false);
-                        break;
-                    case R.id.rdiPaid:
-                        booking = "PAID";
-                        edtPrice.setEnabled(true);
-                        break;
-                }
-            }
-        });
-
-        btnSetTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setTime();
-            }
-        });
-
-        btnSetDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setDate();
-            }
-        });
-
-        //set default
-        edtName.setText(item.getName());
-        edtDescription.setText(item.getDescription());
-        booking = item.getBooking();
-        if (booking == "FREE"){
-            rdiFree.setChecked(true);
-            rdiPaid.setChecked(false);
-        }
-        else if (booking == "PAID"){
-            rdiFree.setChecked(false);
-            rdiPaid.setChecked(true);
-        }
-        edtPrice.setText(item.getPrice());
-        edtLocation.setText(item.getLocation());
-        btnSetDate.setText(item.getDate());
-        btnSetTime.setText(item.getTime());
-
-
-        // set layout and icon for dialog
-        alertDialog.setView(add_new_event_layout);
-        alertDialog.setIcon(R.drawable.ic_event_black_24dp);
-
-        // event for button
-        btnSelect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                chooseImage();
-            }
-        });
-
-        btnUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeImage(item);
-            }
-        });
-
-        // set button
-        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-                // Here, pushing new category to Firebase Database
-
-                item.setName(edtName.getText().toString());
-                item.setPrice(edtPrice.getText().toString());
-                item.setLocation(edtLocation.getText().toString());
-                item.setUserContact(Common.currentUser.getPhone());
-                item.setUserEmail(Common.currentUser.getEmail());
-                item.setBooking(booking);
-                item.setDate(btnSetDate.getText().toString());
-                item.setTime(btnSetTime.getText().toString());
-                item.setDescription(edtDescription.getText().toString());
-                item.setCompanyName(Common.currentUser.getCompanyName());
-
-                eventList.child(key).setValue(item);
-                //eventList.push().setValue(newEvent);
-                Snackbar.make(swipeRefreshLayout, "Event " + item.getName() + " was edited",
-                        Snackbar.LENGTH_SHORT).show();
-
-            }
-        });
-        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        alertDialog.show();
-    }
-
-    private void changeImage(final Event item) {
-        if(saveUri!=null) {
-
-            final ProgressDialog mDialog = new ProgressDialog(this);
-            mDialog.setMessage("Uploading...");
-            mDialog.show();
-
-            String imageName = UUID.randomUUID().toString();
-            final StorageReference imageFolder = storageReference.child("images/" + imageName);
-            imageFolder.putFile(saveUri)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            //set value for newCategory if image upload and we can get download link
-                            mDialog.dismiss();
-                            Toast.makeText(EventList.this, "Uploaded !!!", Toast.LENGTH_SHORT).show();
-                            imageFolder.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    item.setImage(uri.toString());
-                                }
-                            });
-                        }
-
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                            mDialog.dismiss();
-                            Toast.makeText(EventList.this,""+e.getMessage(),Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                            //Don'r worry about this error
-                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                            mDialog.setMessage("Uploaded"+progress+"%");
-                        }
-                    });
-
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -709,24 +252,27 @@ public class EventList extends AppCompatActivity {
 
     private void startSearch(CharSequence text) {
         //create query by name
-        Query searchByName = eventList.orderByChild("name").equalTo(text.toString());
+        Query searchByName = companyList.orderByChild("companyName").equalTo(text.toString());
         //Create options with query
-        FirebaseRecyclerOptions<Event> eventOptions = new FirebaseRecyclerOptions.Builder<Event>()
-                .setQuery(searchByName,Event.class)
+        FirebaseRecyclerOptions<User> companyOptions = new FirebaseRecyclerOptions.Builder<User>()
+                .setQuery(searchByName,User.class)
                 .build();
 
-        searchAdapter = new FirebaseRecyclerAdapter<Event, EventViewHolder>(eventOptions) {
+        searchAdapter = new FirebaseRecyclerAdapter<User, CompanyViewHolder>(companyOptions) {
             @Override
-            protected void onBindViewHolder(@NonNull EventViewHolder viewHolder, int position, @NonNull Event model) {
-                viewHolder.event_name.setText(model.getName());
-                Picasso.with(getBaseContext()).load(model.getImage()).into(viewHolder.event_image);
+            protected void onBindViewHolder(@NonNull CompanyViewHolder viewHolder, final int position, @NonNull final User model) {
+                viewHolder.event_name.setText(model.getCompanyName());
+                Picasso.with(getBaseContext()).load(model.getCompanyImage()).into(viewHolder.event_image);
 
-                final Event local = model;
+                newEventId = searchAdapter.getRef(position).getKey();
+
+                final User local = model;
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
                         Intent eventDetail = new Intent(EventList.this, EventDetail.class);
                         eventDetail.putExtra("eventId", searchAdapter.getRef(position).getKey());
+                        currentCompany = model;
                         startActivity(eventDetail);
                     }
                 });
@@ -734,10 +280,10 @@ public class EventList extends AppCompatActivity {
 
             @NonNull
             @Override
-            public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            public CompanyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.event_item,parent,false);
-                return new EventViewHolder(itemView);
+                return new CompanyViewHolder(itemView);
             }
         };
         searchAdapter.startListening();
@@ -745,12 +291,12 @@ public class EventList extends AppCompatActivity {
     }
 
     private void loadSuggest(){
-        eventList.orderByChild("menuId").equalTo(categoryId).addValueEventListener(new ValueEventListener() {
+        companyList.orderByChild("menuId").equalTo(categoryId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(DataSnapshot postSnapshot:dataSnapshot.getChildren()){
-                    Event item = postSnapshot.getValue(Event.class);
-                    suggestList.add(item.getName());
+                    User item = postSnapshot.getValue(User.class);
+                    suggestList.add(item.getCompanyName());
                 }
                 materialSearchBar.setLastSuggestions(suggestList);
             }
@@ -765,37 +311,35 @@ public class EventList extends AppCompatActivity {
     private void loadListEvent(String categoryId){
 
         //Create query by category Id
-        Query searchByName = eventList.orderByChild("menuId").equalTo(categoryId);
+        Query searchByName = companyList.orderByChild("menuId").equalTo(categoryId);
         //Create options with query
-        FirebaseRecyclerOptions<Event> eventOptions = new FirebaseRecyclerOptions.Builder<Event>()
-                .setQuery(searchByName,Event.class)
+        FirebaseRecyclerOptions<User> companyOptions = new FirebaseRecyclerOptions.Builder<User>()
+                .setQuery(searchByName,User.class)
                 .build();
 
-        adapter = new FirebaseRecyclerAdapter<Event, EventViewHolder>(eventOptions) {
+        adapter = new FirebaseRecyclerAdapter<User, CompanyViewHolder>(companyOptions) {
             @Override
-            protected void onBindViewHolder(@NonNull final EventViewHolder viewHolder, final int position, @NonNull final Event model) {
+            protected void onBindViewHolder(@NonNull final CompanyViewHolder viewHolder, final int position, @NonNull final User model) {
 
-                viewHolder.event_name.setText(model.getName());
-                viewHolder.event_booking.setText(String.format("%s",model.getBooking().toString()));
-                Picasso.with(getBaseContext()).load(model.getImage()).into(viewHolder.event_image);
+                viewHolder.event_name.setText(model.getCompanyName());
+                Picasso.with(getBaseContext()).load(model.getCompanyImage()).into(viewHolder.event_image);
 
                 //Click to share
                 viewHolder.share_image.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Picasso.with(getApplicationContext())
-                                .load(model.getImage())
+                                .load(model.getCompanyImage())
                                 .into(target);
                     }
                 });
-
-                final Event local = model;
+                final User local = model;
                viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
                         Intent eventDetail = new Intent (EventList.this,EventDetail.class);
                         eventDetail.putExtra("eventId",adapter.getRef(position).getKey());
-                        currentEvent = model;
+                        currentCompany = model;
                         startActivity(eventDetail);
                     }
                 });
@@ -803,10 +347,10 @@ public class EventList extends AppCompatActivity {
 
             @NonNull
             @Override
-            public EventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            public CompanyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.event_item,parent,false);
-                return new EventViewHolder(itemView);
+                return new CompanyViewHolder(itemView);
             }
         };
         adapter.startListening();

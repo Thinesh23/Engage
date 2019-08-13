@@ -3,150 +3,131 @@ package example.com.engage.Model;
 import java.util.List;
 
 public class Request {
-    private String PaymentState;
-    private String PaymentMethod;
-    private String FirstName;
-    private String UserPhone;
-    private String UserEmail;
-    private String OrganizerPhone;
-    private String OrganizerEmail;
-    private String OrganizerCompany;
-    private String Date;
-    private String Time;
-    private String Location;
-    private String EventName;
-    private String EventId;
-    private String Status;
+    private String id;
+    private String organizerName;
+    private String organizerPhone;
+    private String organizerEmail;
+    private String plannerPhone;
+    private String plannerEmail;
+    private String plannerCompanyName;
+    private String date;
+    private String time;
+    private String status;
+    private String payment;
+    private Long slot;
 
-    public Request() {
+    public Request(){
+
     }
 
-    public Request(String status, String eventId, String paymentMethod, String paymentState, String firstName, String userPhone, String userEmail, String organizerPhone, String organizerEmail, String organizerCompany, String date, String time, String location, String eventName) {
-        Status = status;
-        EventId = eventId;
-        PaymentMethod = paymentMethod;
-        PaymentState = paymentState;
-        FirstName = firstName;
-        UserPhone = userPhone;
-        UserEmail = userEmail;
-        OrganizerPhone = organizerPhone;
-        OrganizerEmail = organizerEmail;
-        OrganizerCompany = organizerCompany;
-        Date = date;
-        Time = time;
-        Location = location;
-        EventName = eventName;
+    public Request(String id, String organizerName, String organizerPhone, String organizerEmail, String plannerPhone, String plannerEmail, String plannerCompanyName, String date, String time, String status, Long slot, String payment) {
+        this.id = id;
+        this.organizerName = organizerName;
+        this.organizerPhone = organizerPhone;
+        this.organizerEmail = organizerEmail;
+        this.plannerPhone = plannerPhone;
+        this.plannerEmail = plannerEmail;
+        this.plannerCompanyName = plannerCompanyName;
+        this.date = date;
+        this.time = time;
+        this.status = status;
+        this.slot = slot;
+        this.payment = payment;
+    }
+
+    public String getPayment() {
+        return payment;
+    }
+
+    public void setPayment(String payment) {
+        this.payment = payment;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getStatus() {
-        return Status;
+        return status;
     }
 
     public void setStatus(String status) {
-        Status = status;
+        this.status = status;
     }
 
-    public String getEventId() {
-        return EventId;
+    public String getOrganizerName() {
+        return organizerName;
     }
 
-    public void setEventId(String eventId) {
-        EventId = eventId;
-    }
-
-    public String getPaymentMethod() {
-        return PaymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        PaymentMethod = paymentMethod;
-    }
-
-    public String getPaymentState() {
-        return PaymentState;
-    }
-
-    public void setPaymentState(String paymentState) {
-        PaymentState = paymentState;
-    }
-
-    public String getFirstName() {
-        return FirstName;
-    }
-
-    public void setFirstName(String firstName) {
-        FirstName = firstName;
-    }
-
-    public String getUserPhone() {
-        return UserPhone;
-    }
-
-    public void setUserPhone(String userPhone) {
-        UserPhone = userPhone;
-    }
-
-    public String getUserEmail() {
-        return UserEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        UserEmail = userEmail;
+    public void setOrganizerName(String organizerName) {
+        this.organizerName = organizerName;
     }
 
     public String getOrganizerPhone() {
-        return OrganizerPhone;
+        return organizerPhone;
     }
 
     public void setOrganizerPhone(String organizerPhone) {
-        OrganizerPhone = organizerPhone;
+        this.organizerPhone = organizerPhone;
     }
 
     public String getOrganizerEmail() {
-        return OrganizerEmail;
+        return organizerEmail;
     }
 
     public void setOrganizerEmail(String organizerEmail) {
-        OrganizerEmail = organizerEmail;
+        this.organizerEmail = organizerEmail;
     }
 
-    public String getOrganizerCompany() {
-        return OrganizerCompany;
+    public String getPlannerPhone() {
+        return plannerPhone;
     }
 
-    public void setOrganizerCompany(String organizerCompany) {
-        OrganizerCompany = organizerCompany;
+    public void setPlannerPhone(String plannerPhone) {
+        this.plannerPhone = plannerPhone;
+    }
+
+    public String getPlannerEmail() {
+        return plannerEmail;
+    }
+
+    public void setPlannerEmail(String plannerEmail) {
+        this.plannerEmail = plannerEmail;
+    }
+
+    public String getPlannerCompanyName() {
+        return plannerCompanyName;
+    }
+
+    public void setPlannerCompanyName(String plannerCompanyName) {
+        this.plannerCompanyName = plannerCompanyName;
     }
 
     public String getDate() {
-        return Date;
+        return date;
     }
 
     public void setDate(String date) {
-        Date = date;
+        this.date = date;
     }
 
     public String getTime() {
-        return Time;
+        return time;
     }
 
     public void setTime(String time) {
-        Time = time;
+        this.time = time;
     }
 
-    public String getLocation() {
-        return Location;
+    public Long getSlot() {
+        return slot;
     }
 
-    public void setLocation(String location) {
-        Location = location;
-    }
-
-    public String getEventName() {
-        return EventName;
-    }
-
-    public void setEventName(String eventName) {
-        EventName = eventName;
+    public void setSlot(Long slot) {
+        this.slot = slot;
     }
 }

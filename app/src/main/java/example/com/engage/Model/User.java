@@ -1,78 +1,107 @@
 package example.com.engage.Model;
 
 public class User {
-    private String FirstName;
-    private String LastName;
-    private String Email;
-    private String Password;
-    private String Phone;
-    private String UserId;
-    private String IsStaff;
-    private String IsOrganizer;
+    private String firstName;
+    private String email;
+    private String password;
+    private String phone;
+
+    private String status;
+    private String isStaff;
+    private String isPlanner;
     private String secureCode;
-    private String CompanyName;
+    private String companyName;
+    private String companyImage;
+
+    private String menuId;
 
     public User() {
     }
 
-    public User(String firstname, String lastname, String password, String email, String secureCode, String organizer, String companyName) {
-        FirstName = firstname;
-        LastName = lastname;
-        Password = password;
-        Email = email;
-        IsStaff = "false";
-        IsOrganizer = organizer;
+    public User(String firstName, String email, String password, String phone, String isPlanner, String secureCode, String companyName, String companyImage, String menuId) {
+        this.firstName = firstName;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.status = "offline";
+        this.isPlanner = isPlanner;
+        this.isStaff = "false";
         this.secureCode = secureCode;
-        CompanyName = companyName;
+        this.companyName = companyName;
+        this.companyImage = companyImage;
+        this.menuId = menuId;
     }
 
-
-    public String getCompanyName() {
-        return CompanyName;
+    public String getMenuId() {
+        return menuId;
     }
 
-    public void setCompanyName(String companyName) {
-       CompanyName = companyName;
+    public void setMenuId(String menuId) {
+        this.menuId = menuId;
+    }
+
+    public String getCompanyImage() {
+        return companyImage;
+    }
+
+    public void setCompanyImage(String companyImage) {
+        this.companyImage = companyImage;
     }
 
     public String getFirstName() {
-        return FirstName;
+        return firstName;
     }
 
     public void setFirstName(String firstName) {
-        this.FirstName = firstName;
-    }
-
-    public String getLastName() {
-        return LastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.LastName = lastName;
+        this.firstName = firstName;
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public void setEmail(String email) {
-        this.Email = email;
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getIsStaff() {
-        return IsStaff;
+        return isStaff;
     }
 
     public void setIsStaff(String isStaff) {
-        IsStaff = isStaff;
+        this.isStaff = isStaff;
     }
 
-    public String getIsOrganizer() {
-        return IsOrganizer;
+    public String getIsPlanner() {
+        return isPlanner;
     }
 
-    public void setIsOrganizer(String isOrganizer) {
-        IsOrganizer = isOrganizer;
+    public void setIsPlanner(String isPlanner) {
+        this.isPlanner = isPlanner;
     }
 
     public String getSecureCode() {
@@ -83,21 +112,11 @@ public class User {
         this.secureCode = secureCode;
     }
 
-    public String getPhone() {
-        return Phone;
+    public String getCompanyName() {
+        return companyName;
     }
 
-    public void setPhone(String phone) {
-        this.Phone = phone;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
-
-
-    public String getPassword() {
-        return Password;
-    }
-
-    public void setPassword(String password) {
-        this.Password = password;
-    }
-
 }

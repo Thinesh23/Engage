@@ -44,16 +44,16 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
 
         //Here we will fix to click to notification -> go to order list
         if (Common.currentUser != null) {
-            //Intent intent = new Intent(this, OrderStatus.class);
-            //intent.putExtra(Common.PHONE_TEXT, Common.currentUser.getPhone());
-           // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            //pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra(Common.PHONE_TEXT, Common.currentUser.getPhone());
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
             helper = new NotificationHelper(this);
-           // builder = helper.getFoodieChannelNotification(title, message, pendingIntent, defaultSoundUri);
+            builder = helper.getFoodieChannelNotification(title, message, pendingIntent, defaultSoundUri);
             //Generate random id for notification to show all notification
-            //helper.getManager().notify(new Random().nextInt(), builder.build());
+            helper.getManager().notify(new Random().nextInt(), builder.build());
         } else {
             Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             helper = new NotificationHelper(this);
@@ -75,7 +75,7 @@ public class MyFirebaseMessaging extends FirebaseMessagingService {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle(title)
-                .setContentTitle(message)
+                .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);

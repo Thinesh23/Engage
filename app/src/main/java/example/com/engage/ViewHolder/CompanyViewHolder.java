@@ -11,7 +11,7 @@ import example.com.engage.Common.Common;
 import example.com.engage.Interface.ItemClickListener;
 import example.com.engage.R;
 
-public class EventViewHolder extends RecyclerView.ViewHolder implements
+public class CompanyViewHolder extends RecyclerView.ViewHolder implements
         View.OnClickListener,
         View.OnCreateContextMenuListener{
 
@@ -20,12 +20,11 @@ public class EventViewHolder extends RecyclerView.ViewHolder implements
 
     private ItemClickListener itemClickListener;
 
-    public EventViewHolder (View itemView) {
+    public CompanyViewHolder(View itemView) {
 
         super (itemView);
 
         event_name = (TextView) itemView.findViewById(R.id.event_name);
-        event_booking = (TextView) itemView.findViewById(R.id.event_booking);
         event_image = (ImageView) itemView.findViewById(R.id.event_image);
         //fav_image = (ImageView) itemView.findViewById(R.id.fav);
         share_image = (ImageView) itemView.findViewById(R.id.btnShare);

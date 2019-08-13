@@ -2,17 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffff"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    tools:context=".BookingActivity">
+    android:orientation="vertical">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_width="wrap_content"
+        android:layout_height="191dp"
         android:layout_gravity="center_horizontal"
-        android:id="@+id/img_event"
-        android:contentDescription="@null"
-        android:scaleType="centerCrop" />
+        android:src="@drawable/logoblack" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -35,8 +33,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="5dp"
+            android:layout_marginTop="10dp"
             android:text="BOOKING INFORMATION"
             android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:src="@drawable/ic_person_black_24dp" />
+
+            <TextView
+                android:id="@+id/txt_person_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="Thinesh"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,6 +77,12 @@
                 android:text="23/11/1992"
                 android:textSize="14sp" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -71,43 +97,6 @@
                 android:layout_marginLeft="4dp"
                 android:text="18:00"
                 android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:src="@drawable/ic_account_circle_black_24dp" />
-
-            <TextView
-                android:id="@+id/txt_person_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:text="Thinesh"
-                android:textSize="14sp" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginLeft="4dp"
-                android:src="@drawable/ic_attach_money_black_24dp" />
-
-            <TextView
-                android:id="@+id/txt_payment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:text="Payment Required"
-                android:textSize="14sp" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -129,12 +118,18 @@
                 android:text="0165285023"
                 android:textSize="14sp" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_marginLeft="4dp"
-                android:src="@drawable/ic_mail_black_24dp" />
+                android:src="@drawable/ic_mail_black2_24dp" />
 
             <TextView
                 android:id="@+id/txt_user_mail"
@@ -143,51 +138,28 @@
                 android:layout_marginLeft="4dp"
                 android:text="thineshprathaban@gmail.com"
                 android:textSize="14sp" />
-
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="10dp"
             android:background="@android:color/background_dark" />
 
         <TextView
-            android:id="@+id/txt_event_name"
+            android:id="@+id/txt_company_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:textSize="18sp"
-            android:layout_gravity="center_horizontal"
-            android:text="SAMSUNG ROAD SHOW"
+            android:text="SAMSUNG sdn bhd"
             android:textAllCaps="true"
             android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:src="@drawable/ic_business_black_24dp" />
-
-            <TextView
-                android:id="@+id/txt_company_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:text="Thinesh Sdn Bhd"
-                android:textSize="14sp" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -216,7 +188,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:src="@drawable/ic_mail_black_24dp" />
+                android:src="@drawable/ic_mail_black2_24dp" />
 
             <TextView
                 android:id="@+id/txt_contact_mail"
@@ -228,31 +200,6 @@
 
 
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-                  <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:src="@drawable/ic_location_on_black_24dp" />
-
-            <TextView
-                android:id="@+id/txt_location"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:text="Simpang Ampat, Penang"
-                android:textSize="14sp" />
-
-
-
-        </LinearLayout>
-
-
 
         <RelativeLayout
             android:layout_width="match_parent"

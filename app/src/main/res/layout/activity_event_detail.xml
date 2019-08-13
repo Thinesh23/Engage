@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@drawable/images8"
     android:layout_height="match_parent"
     tools:context=".EventDetail">
 
@@ -32,7 +33,7 @@
 
             <android.support.v7.widget.Toolbar
                 android:id="@id/toolbar"
-                android:title="Event Name"
+                android:title="Company Name"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
@@ -97,28 +98,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:padding="12dp"
-                        android:text="Event Name"
+                        android:text="Company Name"
                         android:textColor="@color/colorPrimary"
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:id="@+id/layout_price"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/event_price"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="9"
-                            android:text="10"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="18sp"
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
                 </LinearLayout>
 
 
@@ -152,26 +136,13 @@
                             android:id="@+id/btnShowComment"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/ic_comment_black_24dp"
                             android:layout_alignParentBottom="true"
-                            android:text="Show Comment"
+                            android:text="Show Feedback"
                             android:layout_margin="8dp"
                             android:background="@color/colorAccent"
                             android:textColor="@android:color/white" />
 
                     </LinearLayout>
-
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:id="@+id/event_description"
-                        android:padding="12dp"
-                        android:lineSpacingMultiplier="1.5"
-                        android:textSize="14sp"
-                        android:text="Description" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -196,25 +167,6 @@
                             android:lineSpacingMultiplier="1.5"
                             android:textSize="14sp"
                             android:text="Number" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:padding="12dp"
-                            android:lineSpacingMultiplier="1.5"
-                            android:textSize="14sp"
-                            android:text="Company :" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:padding="12dp"
-                            android:id="@+id/event_company"
-                            android:lineSpacingMultiplier="1.5"
-                            android:textSize="14sp"
-                            android:text="Name" />
 
                     </LinearLayout>
 
@@ -247,102 +199,16 @@
                         android:layout_height="wrap_content">
 
                         <android.support.design.widget.FloatingActionButton
-                            android:id="@+id/btn_message"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:backgroundTint="@color/colorAccent"
-                            android:src="@drawable/ic_chat_bubble_outline_black_24dp"
-                            app:elevation="6dp"
-                            app:layout_anchor="@id/app_bar_layout"
-                            app:pressedTranslationZ="12dp"
-                            app:useCompatPadding="true" />
-
-                        <android.support.design.widget.FloatingActionButton
                             android:id="@+id/btn_show_booking"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
                             android:backgroundTint="@color/colorAccent"
                             android:src="@drawable/ic_person_black_24dp"
                             app:elevation="6dp"
                             app:layout_anchor="@id/app_bar_layout"
                             app:pressedTranslationZ="12dp"
                             app:useCompatPadding="true" />
-                    </LinearLayout>
-
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:padding="12dp"
-                            android:lineSpacingMultiplier="1.5"
-                            android:textSize="14sp"
-                            android:text="Location :" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:id="@+id/event_location"
-                            android:padding="12dp"
-                            android:lineSpacingMultiplier="1.5"
-                            android:textSize="14sp"
-                            android:text="Place" />
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:lineSpacingMultiplier="1.5"
-                            android:padding="12dp"
-                            android:text="Date"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/event_date"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:lineSpacingMultiplier="1.5"
-                            android:padding="12dp"
-                            android:text="yyyy-mm-dd"
-                            android:textSize="14sp" />
-
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:lineSpacingMultiplier="1.5"
-                            android:padding="12dp"
-                            android:text="Time"
-                            android:textSize="14sp" />
-
-
-                        <TextView
-                            android:id="@+id/event_time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:lineSpacingMultiplier="1.5"
-                            android:padding="12dp"
-                            android:text="HH:MM"
-                            android:textSize="14sp" />
-
-
                     </LinearLayout>
 
                 </LinearLayout>

@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.rey.material.widget.CheckBox;
@@ -26,6 +28,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 import io.paperdb.Paper;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -87,29 +91,35 @@ public class SignIn extends AppCompatActivity{
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
 
-
-                            if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
+                            if(edtPhone.getText().toString().isEmpty() || edtPassword.getText().toString().isEmpty()){
                                 mDialog.dismiss();
+                                Toast.makeText(SignIn.this, "Please fill up all the details !", Toast.LENGTH_SHORT).show();
+                            } else {
+                                if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
+                                    mDialog.dismiss();
 
-                                User user = dataSnapshot.child(edtPhone.getText().toString()).getValue(User.class);
-                                user.setPhone(edtPhone.getText().toString());
+                                    User user = dataSnapshot.child(edtPhone.getText().toString()).getValue(User.class);
+                                    user.setPhone(edtPhone.getText().toString());
 
-                                if (user.getPassword().equals(edtPassword.getText().toString())) {
-                                    Intent eventIntent = new Intent(SignIn.this,Home.class);
-                                    Common.currentUser = user;
-                                    startActivity(eventIntent);
-                                    Toast.makeText(SignIn.this, "Sign In Successful !", Toast.LENGTH_SHORT).show();
-                                    finish();
+                                    if (user.getPassword().equals(edtPassword.getText().toString())) {
+                                        Intent eventIntent = new Intent(SignIn.this,Home.class);
+                                        Common.currentUser = user;
+                                        startActivity(eventIntent);
+                                        status("online");
+                                        Toast.makeText(SignIn.this, "Sign In Successful !", Toast.LENGTH_SHORT).show();
+                                        finish();
 
-                                    table_user.removeEventListener(this);
+                                        table_user.removeEventListener(this);
 
-                                } else {
-                                    Toast.makeText(SignIn.this, "Sign In Failed !", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(SignIn.this, "Sign In Failed !", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                                else{
+                                    Toast.makeText(SignIn.this, "User doesn't exist !", Toast.LENGTH_SHORT).show();
                                 }
                             }
-                            else{
-                                Toast.makeText(SignIn.this, "User doesn't exist !", Toast.LENGTH_SHORT).show();
-                            }
+
                         }
 
                         @Override
@@ -124,6 +134,23 @@ public class SignIn extends AppCompatActivity{
                 }
             }
         });
+    }
+
+    private void status (String status){
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status",status);
+        DatabaseReference table_user = FirebaseDatabase.getInstance().getReference("User");
+        table_user.child(Common.currentUser.getPhone())
+                .updateChildren(hashMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                    }
+                });
+
+
     }
 
     private void  showForgotPwdDialog(){

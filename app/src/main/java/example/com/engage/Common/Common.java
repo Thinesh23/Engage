@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.net.ParseException;
 
 import example.com.engage.Model.Event;
+import example.com.engage.Model.TimeSlot;
 import example.com.engage.Model.User;
 import example.com.engage.Remote.APIService;
 import example.com.engage.Remote.GoogleRetrofitClient;
@@ -15,19 +16,27 @@ import example.com.engage.Remote.RetrofitClient;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 
 public class Common {
-    public static User currentUser;
-    public static Event currentEvent;
-
+    public static final Object DISABLE_TAG = "DISABLE";
     public static String PHONE_TEXT = "userPhone";
+    public static final String KEY_ENABLE_BUTTON_NEXT = "ENABLE_BUTTON_NEXT";
+    public static final String KEY_TIME_SLOT = "TIME_SLOT";
+    public static final String KEY_STEP = "STEP";
+    public static final String KEY_CONFIRM_BOOKING = "CONFIRM_BOOKING";
+    public static int currentTimeSlot = -1;
+    public static User currentUser;
+    public static User currentCompany;
+    public static Calendar currentDate = Calendar.getInstance();
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd_MM_yyyy");
+
+    public static int step = 0;
+    public static final int TIME_SLOT_TOTAL = 10;
 
     public static final String INTENT_EVENT_ID = "eventId";
-    public static final String INTENT_USER_ID = "userId";
-    public static final String INTENT_BOOKING_ID = "bookingId";
-
-    public static String restaurantSelected = "";
 
     private static final String BASE_URL = "https://fcm.googleapis.com";
     private static final String GOOGLE_API_URL = "https://maps.googleapis.com";
@@ -68,5 +77,32 @@ public class Common {
         if (format instanceof DecimalFormat)
             ((DecimalFormat) format).setParseBigDecimal(true);
         return (BigDecimal)format.parse(amount.replace("[^\\d.,]", ""));
+    }
+
+    public static String convertTimeSlotToString(int slot){
+       switch(slot){
+           case 0:
+               return "9.00-10:00";
+           case 1:
+               return "10.00-11.00";
+           case 2:
+               return "11.00-12.00";
+           case 3:
+               return "12.00-13.00";
+           case 4:
+               return "13.00-14.00";
+           case 5:
+               return "14.00-15.00";
+           case 6:
+               return "15.00-16.00";
+           case 7:
+               return "16.00-17.00";
+           case 8:
+               return "17.00-18.00";
+           case 9:
+               return "18.00-19.00";
+           default:
+               return "Closed";
+       }
     }
 }

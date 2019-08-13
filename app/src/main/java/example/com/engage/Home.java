@@ -5,11 +5,9 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -32,15 +30,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.andremion.counterfab.CounterFab;
 import example.com.engage.Common.Common;
-import example.com.engage.Database.Database;
 import example.com.engage.Interface.ItemClickListener;
 import example.com.engage.Model.Category;
-import example.com.engage.Model.Event;
 import example.com.engage.Model.Request;
 import example.com.engage.Model.Token;
-import example.com.engage.Model.User;
 import example.com.engage.ViewHolder.MenuViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -75,7 +69,7 @@ public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     FirebaseDatabase database;
-    DatabaseReference category,event,request;
+    DatabaseReference category,event,request,table_user;
     FirebaseStorage storage;
     StorageReference storageReference;
 
@@ -119,8 +113,10 @@ public class Home extends AppCompatActivity
 
         database = FirebaseDatabase.getInstance();
         category = database.getReference("Category");
+
         event = database.getReference("Event");
         request = database.getReference("Request");
+        table_user = database.getReference("User");
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
@@ -224,9 +220,16 @@ public class Home extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        Menu nav_menu = navigationView.getMenu();
+        if(Common.currentUser.getIsPlanner().equals("true") || Common.currentUser.getIsStaff().equals("true")){
+            nav_menu.findItem(R.id.nav_booking_history).setVisible(false);
+        } else {
+            nav_menu.findItem(R.id.nav_booking_history).setVisible(true);
+        }
+
         View headerView = navigationView.getHeaderView(0);
         txtFullName = (TextView) headerView.findViewById(R.id.txtFullName);
-        txtFullName.setText(Common.currentUser.getFirstName() + " " + Common.currentUser.getLastName());
+        txtFullName.setText(Common.currentUser.getFirstName());
 
         recycler_menu = (RecyclerView) findViewById(R.id.recycler_menu);
         recycler_menu.setLayoutManager(new GridLayoutManager(this,2));
@@ -275,7 +278,7 @@ public class Home extends AppCompatActivity
                 dialogInterface.dismiss();
                 if(newCategory !=null)
                 {
-                    category.push().setValue(newCategory);
+                    category.push().child(newCategory.getId()).setValue(newCategory);
                     Snackbar.make(swipeRefreshLayout,"New Category"+ newCategory.getName()+"was added",
                             Snackbar.LENGTH_SHORT ).show();
                 }
@@ -311,7 +314,11 @@ public class Home extends AppCompatActivity
                                 @Override
                                 public void onSuccess(Uri uri) {
 
-                                    newCategory = new Category(edtName.getText().toString(), uri.toString());
+                                    String order_number = String.valueOf(System.currentTimeMillis());
+                                    newCategory = new Category();
+                                    newCategory.setName(edtName.getText().toString());
+                                    newCategory.setImage(uri.toString());
+                                    newCategory.setId(order_number);
 
                                 }
                             });
@@ -500,16 +507,22 @@ public class Home extends AppCompatActivity
     private void updateToken(String token){
         FirebaseDatabase db = FirebaseDatabase.getInstance();
         DatabaseReference tokens = db.getReference("Tokens");
-        Token data = new Token(token,false);
+        Token data = new Token(token);
         tokens.child(Common.currentUser.getPhone()).setValue(data);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+        status("online");
         if(adapter != null)
             adapter.startListening();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        status("offline");
     }
 
     private void loadMenu(){
@@ -549,7 +562,8 @@ public class Home extends AppCompatActivity
         if(item.getItemId() == R.id.refresh) {
             loadMenu();
         } else if (item.getItemId() == R.id.action_message){
-
+            Intent chatIntent = new Intent(Home.this,ChattingMenu.class);
+            startActivity(chatIntent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -560,27 +574,82 @@ public class Home extends AppCompatActivity
 
         int id = item.getItemId();
 
+
+
         if (id == R.id.nav_menu) {
 
         } else if (id == R.id.nav_booking_history){
             Intent historyIntent = new Intent(Home.this,BookingHistory.class);
             startActivity(historyIntent);
+
         } else if (id == R.id.nav_log_out){
+            status("offline");
+            //Common.currentUser = null;
             Paper.book().destroy();
-            Common.currentUser = null;
             Intent signIn = new Intent(Home.this, SignIn.class);
             signIn.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(signIn);
         } else if (id == R.id.nav_change_pwd){
             showChangePasswordDialog();
         } else if (id == R.id.nav_update_profile){
-            showUpdateProfileDialog();
+            if(Common.currentUser.getIsPlanner().equals("true")){
+                showUpdatePlannerProfileDialog();
+            } else {
+                showUpdateProfileDialog();
+            }
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
 
+    }
+
+
+    private void changeCompanyImage() {
+        if(saveUri!=null) {
+
+            final ProgressDialog mDialog = new ProgressDialog(this);
+            mDialog.setMessage("Uploading...");
+            mDialog.show();
+
+            String imageName = UUID.randomUUID().toString();
+            final StorageReference imageFolder = storageReference.child("images/" + imageName);
+            imageFolder.putFile(saveUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            //set value for newCategory if image upload and we can get download link
+                            mDialog.dismiss();
+                            Toast.makeText(Home.this, "Uploaded !!!", Toast.LENGTH_SHORT).show();
+                            imageFolder.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    Common.currentUser.setCompanyImage(uri.toString());
+                                }
+                            });
+                        }
+
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                            mDialog.dismiss();
+                            Toast.makeText(Home.this,""+e.getMessage(),Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            //Don'r worry about this error
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            mDialog.setMessage("Uploaded"+progress+"%");
+                        }
+                    });
+
+        }
     }
 
     private void showUpdateProfileDialog() {
@@ -590,20 +659,19 @@ public class Home extends AppCompatActivity
         alertDialog.setMessage("Please fill all information");
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        View layout_home = inflater.inflate(R.layout.update_profile_layout,null);
+        View layout_home = inflater.inflate(R.layout.update_organizer_profile_layout,null);
 
-        final MaterialEditText updateFirstName = (MaterialEditText)layout_home.findViewById(R.id.updateFirstName);
-        final MaterialEditText updateLastName = (MaterialEditText)layout_home.findViewById(R.id.updateLastName);
-        final MaterialEditText updateEmail = (MaterialEditText)layout_home.findViewById(R.id.updateEmail);
-        final MaterialEditText updateCompanyName = (MaterialEditText)layout_home.findViewById(R.id.updateCompanyName);
-        final DatabaseReference table_request = database.getReference("Request");
-        final DatabaseReference table_event = database.getReference("Event");
+        final MaterialEditText updateFirstName = (MaterialEditText)layout_home.findViewById(R.id.edtFirstName);
+        final MaterialEditText updateEmail = (MaterialEditText)layout_home.findViewById(R.id.edtEmail);
+        final MaterialEditText updateCompanyName = (MaterialEditText)layout_home.findViewById(R.id.edtCompanyName);
+        final MaterialEditText updateSecureCode = (MaterialEditText)layout_home.findViewById(R.id.edtSecureCode);
+        final DatabaseReference table_request = database.getReference("Requests");
 
         //Set default
         updateFirstName.setText(Common.currentUser.getFirstName());
-        updateLastName.setText(Common.currentUser.getLastName());
         updateEmail.setText(Common.currentUser.getEmail());
         updateCompanyName.setText(Common.currentUser.getCompanyName());
+        updateSecureCode.setText(Common.currentUser.getSecureCode());
         alertDialog.setView(layout_home);
 
         alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
@@ -613,72 +681,184 @@ public class Home extends AppCompatActivity
                 dialog.dismiss();
 
 
-                if(!updateFirstName.getText().toString().isEmpty() ||
-                        !updateLastName.getText().toString().isEmpty() ||
-                        !updateEmail.getText().toString().isEmpty() ||
-                        !updateCompanyName.getText().toString().isEmpty()) {
+                if(updateFirstName.getText().toString().trim().length() != 0 &&
+                        updateEmail.getText().toString().trim().length() != 0 &&
+                        updateCompanyName.getText().toString().trim().length() != 0 &&
+                        updateSecureCode.getText().toString().trim().length() != 0) {
 
                         //updated
                         Common.currentUser.setFirstName(updateFirstName.getText().toString());
-                        Common.currentUser.setLastName(updateLastName.getText().toString());
                         Common.currentUser.setEmail(updateEmail.getText().toString());
                         Common.currentUser.setCompanyName(updateCompanyName.getText().toString());
+                        Common.currentUser.setSecureCode(updateSecureCode.getText().toString());
 
-                        FirebaseDatabase.getInstance().getReference("User")
-                                .child(Common.currentUser.getPhone())
-                                .setValue(Common.currentUser)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        Toast.makeText(Home.this,"Profile updated",Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                    FirebaseDatabase.getInstance().getReference("User")
+                            .child(Common.currentUser.getPhone())
+                            .setValue(Common.currentUser)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    Toast.makeText(Home.this,"Profile updated",Toast.LENGTH_SHORT).show();
+                                    table_request.orderByChild("organizerPhone").equalTo(Common.currentUser.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists()){
+                                                for (DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
+                                                    Request item = dataSnapshot1.getValue(Request.class);
+                                                    HashMap<String, Object> hashMap = new HashMap<>();
+                                                    hashMap.put("organizerPhone", Common.currentUser.getPhone());
+                                                    hashMap.put("organizerEmail", Common.currentUser.getEmail());
+                                                    hashMap.put("organizerName", Common.currentUser.getCompanyName());
+                                                    table_request.child(item.getId()).updateChildren(hashMap)
+                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
 
-                    table_event.orderByChild("userContact").equalTo(Common.currentUser.getPhone()).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for(DataSnapshot postSnapshot:dataSnapshot.getChildren()){
-                                postSnapshot.child("userEmail").getRef().setValue(Common.currentUser.getEmail());
-                                postSnapshot.child("companyName").getRef().setValue(Common.currentUser.getCompanyName());
-                            }
-                        }
+                                                                }
+                                                            });
+                                                }
+                                            }
+                                        }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
-
-                    table_request.orderByChild("organizerPhone").equalTo(Common.currentUser.getPhone()).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for(DataSnapshot postSnapshot:dataSnapshot.getChildren()){
-                                postSnapshot.child("organizerEmail").getRef().setValue(Common.currentUser.getEmail());
-                                postSnapshot.child("organizerCompany").getRef().setValue(Common.currentUser.getCompanyName());
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
+                                        }
+                                    });
+                                }
+                            });
 
                 } else {
                     Toast.makeText(Home.this,"Please fill up all the details",Toast.LENGTH_SHORT).show();
                 }
-
-
-
             }
         });
 
         alertDialog.show();
     }
 
-    private void showChangePasswordDialog(){
+    private void showUpdatePlannerProfileDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(Home.this);
+        alertDialog.setTitle("Update Profile");
+        alertDialog.setIcon(R.drawable.ic_person_black_24dp);
+        alertDialog.setMessage("Please fill all information");
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View layout_home = inflater.inflate(R.layout.update_profile_layout,null);
+
+        final MaterialEditText updateFirstName = (MaterialEditText)layout_home.findViewById(R.id.edtFirstName);
+        final MaterialEditText updateEmail = (MaterialEditText)layout_home.findViewById(R.id.edtEmail);
+        final MaterialEditText updateCompanyName = (MaterialEditText)layout_home.findViewById(R.id.edtCompanyName);
+        final MaterialEditText updateSecureCode = (MaterialEditText)layout_home.findViewById(R.id.edtSecureCode);
+
+
+        btnSelect = layout_home.findViewById(R.id.btnSelect);
+        btnUpload = layout_home.findViewById(R.id.btnUpload);
+
+        //Event for button
+        btnSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                chooseImage();
+            }
+        });
+
+        btnUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeCompanyImage();
+            }
+        });
+
+        final DatabaseReference table_request = database.getReference("Requests");
+
+        //Set default
+        updateFirstName.setText(Common.currentUser.getFirstName());
+        updateEmail.setText(Common.currentUser.getEmail());
+        updateCompanyName.setText(Common.currentUser.getCompanyName());
+        updateSecureCode.setText(Common.currentUser.getSecureCode());
+        alertDialog.setView(layout_home);
+
+        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+
+
+                if(updateFirstName.getText().toString().trim().length() != 0 &&
+                        updateEmail.getText().toString().trim().length() != 0 &&
+                        updateCompanyName.getText().toString().trim().length() != 0 &&
+                        updateSecureCode.getText().toString().trim().length() != 0) {
+
+                    //updated
+                    Common.currentUser.setFirstName(updateFirstName.getText().toString());
+                    Common.currentUser.setEmail(updateEmail.getText().toString());
+                    Common.currentUser.setCompanyName(updateCompanyName.getText().toString());
+                    Common.currentUser.setSecureCode(updateSecureCode.getText().toString());
+
+                    FirebaseDatabase.getInstance().getReference("User")
+                            .child(Common.currentUser.getPhone())
+                            .setValue(Common.currentUser)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    Toast.makeText(Home.this,"Profile updated",Toast.LENGTH_SHORT).show();
+                                    table_request.orderByChild("plannerPhone").equalTo(Common.currentUser.getPhone()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists()){
+                                                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                                                    Request item = dataSnapshot1.getValue(Request.class);
+                                                    HashMap<String, Object> hashMap = new HashMap<>();
+                                                    hashMap.put("plannerPhone", Common.currentUser.getPhone());
+                                                    hashMap.put("plannerEmail", Common.currentUser.getEmail());
+                                                    hashMap.put("plannerCompanyName", Common.currentUser.getCompanyName());
+                                                    table_request.child(item.getId()).updateChildren(hashMap)
+                                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task) {
+
+                                                                }
+                                                            });
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                }
+                            });
+
+                } else {
+                    Toast.makeText(Home.this,"Please fill up all the details",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        alertDialog.show();
+    }
+
+    private void status (String status){
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("status",status);
+        DatabaseReference table_user = FirebaseDatabase.getInstance().getReference("User");
+        table_user.child(Common.currentUser.getPhone())
+                .updateChildren(hashMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                    }
+                });
+
+    }
+
+    private void showChangePasswordDialog(){
+        final AlertDialog.Builder alertDialog = new AlertDialog.Builder(Home.this);
         alertDialog.setTitle("CHANGE PASSWORD");
         alertDialog.setMessage("Please fill all information");
 
@@ -693,39 +873,47 @@ public class Home extends AppCompatActivity
         alertDialog.setPositiveButton("CHANGE", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                final android.app.AlertDialog waitingDialog = new SpotsDialog(Home.this);
+                final android.app.AlertDialog waitingDialog = new SpotsDialog.Builder().setContext(Home.this).setCancelable(false).build();
                 waitingDialog.show();
 
-                if(edtPassword.getText().toString().equals(Common.currentUser.getPassword())){
-                    if(edtNewPassword.getText().toString().equals(edtRepeatPassword.getText().toString())){
-                        Map<String,Object> passwordUpdate = new HashMap<>();
-                        passwordUpdate.put("Password",edtNewPassword.getText().toString());
+                if (edtPassword.getText().toString().isEmpty() || edtNewPassword.getText().toString().isEmpty()
+                        || edtRepeatPassword.getText().toString().isEmpty()){
+                    waitingDialog.dismiss();
+                    Toast.makeText(Home.this, "Please fill up all the details !!",Toast.LENGTH_SHORT).show();
+                } else {
+                    if(edtPassword.getText().toString().equals(Common.currentUser.getPassword())){
+                        if(edtNewPassword.getText().toString().equals(edtRepeatPassword.getText().toString())){
+                            Map<String,Object> passwordUpdate = new HashMap<>();
+                            passwordUpdate.put("Password",edtNewPassword.getText().toString());
 
-                        DatabaseReference user = FirebaseDatabase.getInstance().getReference("User");
-                        user.child(Common.currentUser.getPhone())
-                                .updateChildren(passwordUpdate)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        waitingDialog.dismiss();
-                                        Toast.makeText(Home.this, "Password updated !!",Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
+                            DatabaseReference user = FirebaseDatabase.getInstance().getReference("User");
+                            user.child(Common.currentUser.getPhone())
+                                    .updateChildren(passwordUpdate)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            waitingDialog.dismiss();
+                                            Toast.makeText(Home.this, "Password updated !!",Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
 
-                                        Toast.makeText(Home.this, e.getMessage(),Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                                            Toast.makeText(Home.this, e.getMessage(),Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        } else {
+                            waitingDialog.dismiss();
+                            Toast.makeText(Home.this, "New Password doesnt match",Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         waitingDialog.dismiss();
-                        Toast.makeText(Home.this, "New Password doesnt match",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Home.this, "Wrong Old Password",Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    waitingDialog.dismiss();
-                    Toast.makeText(Home.this, "Wrong Old Password",Toast.LENGTH_SHORT).show();
                 }
+
+
             }
         });
 
@@ -738,6 +926,5 @@ public class Home extends AppCompatActivity
 
         alertDialog.show();
     }
-
 
 }

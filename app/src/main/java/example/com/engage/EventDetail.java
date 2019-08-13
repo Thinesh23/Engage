@@ -2,7 +2,6 @@ package example.com.engage;
 
 import android.content.Context;
 import android.content.Intent;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -15,12 +14,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.andremion.counterfab.CounterFab;
-import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import example.com.engage.Common.Common;
-import example.com.engage.Database.Database;
-import example.com.engage.Model.Event;
-import example.com.engage.Model.Order;
 import example.com.engage.Model.Rating;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -28,35 +22,33 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 import com.stepstone.apprating.AppRatingDialog;
 import com.stepstone.apprating.listener.RatingDialogListener;
 
 import java.util.Arrays;
-import java.util.Queue;
 
+import example.com.engage.Model.User;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class EventDetail extends AppCompatActivity implements RatingDialogListener{
 
-    TextView event_name, event_price, event_description, event_userContact, event_location, event_time, event_date, event_userEmail, event_userCompany;
+    TextView event_name, event_userContact, event_userEmail;
     ImageView event_image;
     CollapsingToolbarLayout collapsingToolbarLayout;
-    FloatingActionButton btnRating,btnBooking,btnMessage,btnProfile;
+    FloatingActionButton btnRating,btnBooking,btnProfile;
     RatingBar ratingBar;
     Button btnShowComment;
 
     String eventId="";
-    String userId="";
 
     FirebaseDatabase database;
-    DatabaseReference event;
+    DatabaseReference planner;
     DatabaseReference ratingTbl;
 
-    Event currentEvent;
+    User currentCompany;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -73,73 +65,19 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
                 .build());
         setContentView(R.layout.activity_event_detail);
 
-        btnShowComment = (Button)findViewById(R.id.btnShowComment);
-        btnShowComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(EventDetail.this,ShowComment.class);
-                intent.putExtra(Common.INTENT_EVENT_ID,eventId);
-                startActivity(intent);
-            }
-        });
-
-        btnProfile = (FloatingActionButton) findViewById(R.id.btn_show_booking);
-        if(Common.currentUser.getPhone().equals(Common.currentEvent.getUserContact())){
-            btnProfile.show();
-            btnProfile.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(EventDetail.this,ShowBooking.class);
-                    intent.putExtra(Common.INTENT_EVENT_ID,eventId);
-                    startActivity(intent);
-                }
-            });
-        } else {
-            btnProfile.hide();
-        }
-        btnBooking = (FloatingActionButton) findViewById(R.id.btn_booking);
-        if(Common.currentUser.getPhone().equals(Common.currentEvent.getUserContact())){
-            btnBooking.hide();
-        } else {
-            btnBooking.show();
-            btnBooking.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(EventDetail.this,BookingActivity.class);
-                    intent.putExtra(Common.INTENT_EVENT_ID,eventId);
-                    startActivity(intent);
-                }
-            });
-        }
-
-
-
         database = FirebaseDatabase.getInstance();
-        event = database.getReference("Event");
+        planner = database.getReference("User");
         ratingTbl = database.getReference("Rating");
 
         ratingBar = (RatingBar) findViewById(R.id.ratingBar);
 
-        btnRating = (FloatingActionButton) findViewById(R.id.btn_rating);
 
+        btnRating = (FloatingActionButton) findViewById(R.id.btn_rating);
         btnBooking = (FloatingActionButton) findViewById(R.id.btn_booking);
 
-        btnRating.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showRatingDialog();
-            }
-        });
-
-        event_description = (TextView) findViewById(R.id.event_description);
         event_name = (TextView) findViewById(R.id.event_name);
-        event_price = (TextView) findViewById(R.id.event_price);
-        event_date = (TextView) findViewById(R.id.event_date);
-        event_location = (TextView) findViewById(R.id.event_location);
-        event_time = (TextView) findViewById(R.id.event_time);
         event_userContact = (TextView) findViewById(R.id.event_contact);
         event_userEmail = (TextView) findViewById(R.id.event_email);
-        event_userCompany = (TextView) findViewById(R.id.event_company);
 
         event_image = (ImageView) findViewById(R.id.img_event);
 
@@ -161,6 +99,68 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
                 return;
             }
         }
+
+        btnShowComment = (Button)findViewById(R.id.btnShowComment);
+        btnShowComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EventDetail.this,ShowComment.class);
+                intent.putExtra(Common.INTENT_EVENT_ID,eventId);
+                startActivity(intent);
+            }
+        });
+
+        btnProfile = (FloatingActionButton) findViewById(R.id.btn_show_booking);
+        if(Common.currentUser.getPhone().equals(Common.currentCompany.getPhone())){
+            btnProfile.show();
+            btnProfile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(EventDetail.this,ShowBooking.class);
+                    intent.putExtra(Common.INTENT_EVENT_ID,eventId);
+                    startActivity(intent);
+                }
+            });
+        } else {
+            btnProfile.hide();
+        }
+        btnBooking = (FloatingActionButton) findViewById(R.id.btn_booking);
+
+
+
+        if(Common.currentUser.getPhone().equals(Common.currentCompany.getPhone())){
+            btnBooking.hide();
+            btnRating.hide();
+        } else {
+            if (Common.currentUser.getIsStaff().toString().equals("true")){
+                btnBooking.hide();
+                btnRating.show();
+                btnRating.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showRatingDialog();
+                    }
+                });
+            } else {
+                btnRating.show();
+                btnRating.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showRatingDialog();
+                    }
+                });
+                btnBooking.show();
+                btnBooking.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(EventDetail.this,BookingActivity2.class);
+                        intent.putExtra(Common.INTENT_EVENT_ID,eventId);
+                        startActivity(intent);
+                    }
+                });
+            }
+
+        }
     }
 
     private void showRatingDialog(){
@@ -169,7 +169,7 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
                 .setNegativeButtonText("Cancel")
                 .setNoteDescriptions(Arrays.asList("Very Bad","Not Good","Quite Ok","Very Good","Excellent"))
                 .setDefaultRating(1)
-                .setTitle("Rate this Event")
+                .setTitle("Rate this Planner")
                 .setDescription("Please give your rating and feedback")
                 .setTitleTextColor(R.color.colorPrimary)
                 .setDescriptionTextColor(R.color.colorPrimary)
@@ -182,27 +182,17 @@ public class EventDetail extends AppCompatActivity implements RatingDialogListen
     }
 
     private void getDetailEvent(String eventId){
-        event.child(eventId).addValueEventListener(new ValueEventListener() {
+        planner.child(eventId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                currentEvent = dataSnapshot.getValue(Event.class);
-                if (currentEvent != null) {
-                    Picasso.with(getBaseContext()).load(currentEvent.getImage()).into(event_image);
+                currentCompany = dataSnapshot.getValue(User.class);
+                if (currentCompany != null) {
+                    Picasso.with(getBaseContext()).load(currentCompany.getCompanyImage()).into(event_image);
 
-                    collapsingToolbarLayout.setTitle(currentEvent.getName());
-                    if (currentEvent.getBooking().equals("FREE")){
-                        event_price.setVisibility(View.INVISIBLE);
-                    } else if (currentEvent.getBooking().equals("PAID")) {
-                        event_price.setText("RM " + currentEvent.getPrice());
-                    }
-                    event_name.setText(currentEvent.getName());
-                    event_description.setText(currentEvent.getDescription());
-                    event_date.setText(currentEvent.getDate());
-                    event_time.setText(currentEvent.getTime());
-                    event_location.setText(currentEvent.getLocation());
-                    event_userContact.setText(currentEvent.getUserContact());
-                    event_userEmail.setText(currentEvent.getUserEmail());
-                    event_userCompany.setText(currentEvent.getCompanyName());
+                    collapsingToolbarLayout.setTitle(currentCompany.getCompanyName());
+                    event_name.setText(currentCompany.getCompanyName());
+                    event_userContact.setText(currentCompany.getPhone());
+                    event_userEmail.setText(currentCompany.getEmail());
                 }
             }
 

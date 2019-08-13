@@ -14,8 +14,8 @@ import example.com.engage.R;
 
 public class NotificationHelper extends ContextWrapper {
 
-    private static final String UTP_CHANNEL_ID = "com.example.foodie.foodie.UTP";
-    private static final String UTP_CHANNEL_NAME = "UTP Foodie";
+    private static final String UTP_CHANNEL_ID = "example.com.engage";
+    private static final String UTP_CHANNEL_NAME = "Engage";
 
     private NotificationManager manager;
 

@@ -2,31 +2,42 @@ package example.com.engage.Model;
 
 public class Category {
 
-    private String Name;
-    private String Image;
+    private String name;
+    private String image;
+    private String id;
 
 
     public Category() {
     }
 
-    public Category(String name, String image) {
-        Name = name;
-        Image = image;
+
+    public Category(String name, String image, String id) {
+        this.name = name;
+        this.image = image;
+        this.id = id;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public String getImage() {
-        return Image;
+        return image;
     }
 
     public void setImage(String image) {
-        Image = image;
+        this.image = image;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

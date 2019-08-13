@@ -35,6 +35,7 @@ import java.security.NoSuchAlgorithmException;
 import example.com.engage.Common.Common;
 import example.com.engage.Model.User;
 import io.paperdb.Paper;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity{
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent signUp = new Intent(MainActivity.this, SignUp.class);
+                Intent signUp = new Intent(MainActivity.this, ChooseUser.class);
                 startActivity(signUp);
             }
         });

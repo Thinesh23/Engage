@@ -4,6 +4,7 @@ package example.com.engage.Remote;
 import example.com.engage.Model.DataMessage;
 import example.com.engage.Model.MyResponse;
 
+import example.com.engage.Model.Sender;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Headers;
